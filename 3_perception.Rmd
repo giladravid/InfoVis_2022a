@@ -1,0 +1,493 @@
+---
+title: "Human Perception and Information Processing"
+subtitle: "Lesson 3"
+author: "Gilad Ravid"
+institute: "BGU"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "sup/gilad.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+```{r echo=FALSE, warning=FALSE}
+library(linguisticsdown)
+library(ggplot2)
+library(knitr)
+library(dplyr)
+
+```
+---
+### What is Perception?
+Perception - The process of recognizing (being aware of), organizing (gathering and storing), and interpreting (binding to knowledge) sensory information.
+
+The process by which we interpret the world around us, forming a mental representation of the environment.
+---
+![](images/3_1.jpg)
+---
+![](images/3_2.jpg)
+![](images/3_3.jpg)
+---
+![](images/3_5.jpg)
+---
+### Hering illusion (1861)
+![](https://upload.wikimedia.org/wikipedia/commons/a/a0/Hering_illusion.svg)
+---
+### Kanizsa Triangle (1955)
+![](https://upload.wikimedia.org/wikipedia/commons/5/55/Kanizsa_triangle.svg)
+- “The visual system is not very good at being a physical light meter, but that is not its purpose.” (Adelson, 1995)
+---
+### Physiology
+The main sensory component is to form 2d on the photoreceptors.
+
+photoreceptors respond in the presence of photons that make up light waves
+
+~ 380 nm - 700 nm (and shrink with age)
+![](images/3_6.jpg)
+---
+### Anatomy of the Visual System
+.pull-left[![](https://upload.wikimedia.org/wikipedia/commons/0/02/Schematic_diagram_of_the_human_eye_he.svg)
+]
+.pull-right[![](https://upload.wikimedia.org/wikipedia/commons/1/1e/Schematic_diagram_of_the_human_eye_en.svg)
+]
+---
+### Anatomy  (2)
+- The major parts: cornea, iris, pupil, lens, retina
+- Cornea
+    - exterior cover - protective mechanism
+    - lens
+- Pupil
+    - circular hole in the iris
+    - like an aperture stop
+- Iris
+    - colored annulus
+    - contain radial muscles
+    - change the size of the pupil opening
+-Lens
+    - crystalline structure
+    - ciliary body - muscles
+    - stretch and compress
+    - adjusting the focal length
+- Retina
+    - the photoreceptive layer
+- six motion control muscles
+    - moving the optical system to look on an object
+    - maintain the eye level
+    - stabilization of images
+- one optic nerve
+
+---
+### The Retina
+.pull-left[
+Rod (קנה)
+![](https://upload.wikimedia.org/wikipedia/commons/e/e7/Rod_Cell.svg)
+]
+
+.pull-right[
+Cone (מדוך)
+![](https://upload.wikimedia.org/wikipedia/commons/a/a0/Cone_cell_en.png)
+]
+---
+### The Retina (2)
+- Rods - intensity perception; Cones - color perception
+- Rods x10 more sensitive to light than cones
+- ~ 120x10^6 rods, ~ 6x10^6 cones, 1x10^6 fibers in the nerve
+
+![](http://www.rags-int-inc.com/phototechstuff/cameraeye/sm_EyeConeDistrubition.jpg)
+---
+### The Retina (3)
+![](https://askabiologist.asu.edu/sites/default/files/resources/articles/seecolor/Light-though-eye-big.png)
+---
+### Rods
+- scotopic vision, night vision
+- operating in clusters to increase sensitivity
+- achromatic
+- in daylight levels of illumination - hyperpolarized or completely saturated
+### Cones
+- photopic vision
+- operate individually - high degree of accuracy
+- sensitive over small moving window based range
+- adapt to average wavelength
+---
+![](https://upload.wikimedia.org/wikipedia/commons/0/04/Cone-fundamentals-with-srgb-spectrum.svg)
+---
+### Results
+- best stimulation from light entering straight on through the pupil
+- sampling rate
+- respond to ratios of intensities and not to absolute values
+
+---
+### Color Blindness
+- 10% of men; 1% women
+- usually on the L (protanopia) or M cones (deuteranopia)
+- inability to distinguish red and green
+---
+### Visual Processing
+![](https://upload.wikimedia.org/wikipedia/commons/b/bf/Human_visual_pathway.svg)
+- Retinal Processing
+    - 4 neuron layers
+    - combne to produce colors
+    
+---
+### Visual Processing (2)
+.img-h[
+![](https://upload.wikimedia.org/wikipedia/commons/c/cd/Lisa_analysis.png)
+]
+- half the fibers from each eye cross to the opposite side
+- each hemisphere receives visual information from both eyes
+
+---
+### Eye Movement
+- smooth pursuit movement
+    - eye follow an object
+    -also called conjugate eye movements or coordinated eye movements
+    - the angles between the normal to the face are equal
+- Vergence eye movements
+    - non-conjugate movement
+- Saccadic eye movements
+    - multiple targets of interest
+- Saccadic Masking
+
+![](https://upload.wikimedia.org/wikipedia/commons/d/d3/Szakkad.jpg)
+
+---
+### Perceptual Processing 
+Cowan (1988)
+.img-w[
+![](images/3_7.png)]
+---
+### Perceptual Processing (2)
+- memory involved in post processing
+- perception
+    - intrinsic, uncontrolled - preattentive
+        - fast
+        - parallel (~250 ms)
+    - controlled - attentive
+        - slower
+        - short term memory
+        - selective
+        - represnts aggregates
+        
+---
+### Preattentive
+.pull-left[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/colour_P.gif)]
+--
+.pull-right[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/colour_A.gif)]
+--
+.pull-left[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/shape_A.gif)]
+--
+.pull-right[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/shape_P.gif)]
+---
+### Conjunction Target
+.pull-left[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/conjoin_A.gif)]
+--
+.pull-right[![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/conjoin_P.gif)]
+--
+
+combination on nonunique features normally cannot be detected preattentively
+
+---
+### Tips
+- Harness low-level visual system during visualization
+    - draw attention to areas of potential interest
+- visual features assigned to data attributes can take advantage
+- align to users needs
+- must not produce visual interference that masks information
+
+---
+### Preattentive Features
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_len.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_size.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_orient.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_curve.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_num.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_term.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_isect.gif)
+
+length, width, size, orientation, curvature, number, terminators, intersection
+---
+### Preattentive Features (2)
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_closure.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_hue.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_lum.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_flick.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_dir.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_3d_depth.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/tg_3d_light.gif)
+
+
+closure, hue, intensity, flicker, direction of motion, 3D depth cues, lightning direction, binocular luster
+---
+### Feature Integration Theory - Treisman
+- Detected preattentive features
+    - target detection
+    - boundary detection
+    - measured response time and accuracy
+- How the human visual system performs preattentive processing
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/hue_boundary.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/conjoin_boundary.gif)
+
+- some preattentive features are asymmetric
+---
+### Feature Integration Theory - Treisman (2)
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/feature_map.gif)
+---
+### Texton Theory - Bella Julesz
+- detects a group of features called textons
+    - elongated blob with specific properties
+    - terminators
+    - crossing
+- Only difference in textons or their density can be detected preattentively
+
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/texton_grid.gif)
+---
+### Similarity Theory
+- Quinlan & Humphreys
+- investigated conjunction searches
+    1. search time may depend on the number of items of information required to identify the target
+    2. search time may depend on how easily a target can be distinguished from its distractors, regardless
+of the presence of unique preattentive features.
+- search time is based on T-N similarity and N-N similarity
+    - T-N + | efficiency - | search time +
+    - N-N - | efficiency - | search time +
+    - N-N - && T-N~0 --> little effect
+    - T-N + && N-N>>0 --> little effect
+    
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/N-N-high.gif)   ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/N-N-lo.gif)
+---
+### Similarity Theory
+1. The visual field is segmented into hierarchical structural units. Individual structural units share some common properties (e.g., spatial proximity, hue, shape, motion). This segmentation process occurs in parallel.
+2. visual short-term memory is limited. A template of the information being sought is available. Each structural unit is compared to this template. The better the match, the more resources allocated to the given structural unit relative to other units with a poorer match.
+3. Because units are grouped in a hierarchy, a poor match between the template and a structural unit allows efficient rejection of other units that are strongly grouped to the rejected unit.
+---
+### Guided Search Theory - Jeremy Wolfe
+- An activation map based on both bottom-up and top-down information is constructed during visual search
+- Attention is drawn to peaks in the activation map
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/activation_map.gif)
+- Bottom-up activation follows feature categorization. measures differences between elements and neighbors.
+- Top-down activation attempts to find items with a specific property or set of properties
+
+---
+### Boolean Map Theory -Huang et al.
+- divides a visual search task into two parts: selection and access.
+    - Selection involves choosing a set of objects from a scene. 
+    - Access determines what properties of the selected objects a viewer can apprehend. 
+    
+-dividing a scene into exactly two parts: selected elements and excluded elements. This is the "boolean map".
+---
+### Boolean Map Theory (2)
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/boolean_map_full.png) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/boolean_map_red.png)
+
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/boolean_map_vert.png) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/boolean_map_loc.png)
+
+---
+### Feature Hierarchy
+- One promising strategy for multidimensional visualization is to assign diﬀerent visual features
+to diﬀerent data attributes.
+- Interference as results from a feature hierarchy
+    - boundry detection, favors color over shape
+    - background variations
+    - luminance over hue
+    - hue over texture
+- The most important data attribute (as defined by the viewer) should be displayed with the most salient visual feature.
+
+---
+### Feature Hierarchy (2)
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/hue_shape_A.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/hue_shape_P.gif)
+
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/shape_hue_A.gif) ![](https://www.csc2.ncsu.edu/faculty/healey/PP/figs/shape_hue_P.gif)
+
+---
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/movies/Airplane.gif)
+---
+![](images/3_8.gif)
+---
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/movies/Tourists.gif)
+---
+![](images/3_9.gif)
+---
+![](https://www.csc2.ncsu.edu/faculty/healey/PP/movies/Market.gif)
+---
+![](images/3_10.gif)
+---
+### Change Blindness
+- Human vision does not resemble the relatively faithful and largely passive process of modern photography.
+
+- The goal of human vision is not to create a replica or image of the seen world in our heads.
+
+- A much better metaphor for vision is that of a dynamic and ongoing construction project, where the products being built are short-lived models of the external world that are speciﬁcally designed for the current visually guided tasks of the viewer.
+
+- There does not appear to be any general-purpose vision. 
+
+- What we “see” when confronted with a new scene depends as much on our goals and expectations as it does on the array of
+light that enters our eyes.
+- "visible" and "not visible" represent two ends of a continuous spectrum.
+---
+### Change Blindness (2)
+- The images we produce are normally novel for our viewers, so prior expectations cannot be used to guide their analyses.
+Instead, we strive to direct the eye, and therefore the mind, to areas of interest or importance within a visualization. 
+
+---
+### Memory
+- Sensory memory
+    - High capacity
+    - very fast
+    - importance of positional learning
+    
+- Short term memory (Immediate memory)
+    - limited capacity
+    - high level of processing
+    - less than 30 sec.
+    - Miller (1956) 7 $+/-$ 2 chunks
+        - we "chunk" things at the largest logical unit
+        - The role of recording
+    
+    
+- Long term memory
+    - Complex
+    - limitless
+    - organized in complex network structure
+    - accessis unreliable
+    - slow
+---
+Rinadeg Oedrr
+
+Aoccdrnig to a rscarhee at Cigdmabre Uinervtisy, it deosn’t mtetar in waht oredr the ltteers in a wrod are, the olny iprmoatnt tihng is taht the frist and lsat ltteer be at the rghit pclae. The rset can be a taotl mses and you can sitll raed it wouthit porbelm. Tihs is bcuseae the huamn mnid deos not raed ervey lteter by istlef, but the wrod as a wlohe.
+
+
+--
+
+
+Anidroccg to crad cniyrrag lcitsiugnis planoissefors at an uemannd, utisreviny in Bsitirh Cibmuloa, and crartnoy to the duoibus cmials of the ueticnd rcraeseh, a slpmie, macinahcel ioisrevnn of ianretnl cretcarahs araepps sneiciﬀut to csufnoe the eadyrevy oekoolnr
+---
+### Homan Limitations
+- How many distinct line lengths and orientations can humans accurately perceive?
+- How many diﬀerent sound pitches or volumes can we distinguish without error?
+- What is our “channel capacity” when dealing with color, taste, smell, or any other of our senses? 
+- How are humans capable of recognizing hundreds of faces and thousands of spoken words?
+- What graphical entities can be accurately measured by humans?
+- How many distinct entities can be used in a visualization without confusion?
+- With what level of accuracy do we perceive various primitives?
+- How do we combine primitives to recognize complex phenomena?
+- How should color be used to present information?
+
+---
+![](images/1_33.png)
+--
+![](images/1_34.png)
+
+---
+### Resource Model of Human Information Processing
+- Channel Capacity
+    - George Miller, 1956
+    - borrowed from the information theory
+    - input, processing, output
+    - number of levels that average human can measure with high accuracy
+    - measured in bits
+    - methodology: no training, avoid specialists, no context
+
+---
+
+### Stimuli
+.scroll-output[
+stimuli | researhcer | step | levels | bit
+--------|------------|------|--------|----
+sound pitch|Pollack|log. 100-800 cps |6|`r round(log2(6),digits=2)`
+sound loudness|Gardner|15-110 db|5|`r round(log2(5),digits=2)`
+salianity|Beebe-Center|0.3-34.7 gr/100 cc water|4|`r round(log2(4),digits=2)`
+position on a line|Hake Gardner|0-100|10-15|`r round(log2(10),digits=2)` - `r round(log2(15),digits=2)`
+size of squares|Eriksen Hake||4-5|`r round(log2(4),digits=2)` - `r round(log2(5),digits=2)`
+color hue|Eriksen||10|`r round(log2(10),digits=2)`
+color brightness|Eriksen||15|`r round(log2(15),digits=2)`
+Touch intencities|Gelard||4 |`r round(log2(4),digits=2)`
+Touch duration|Gelard||5 |`r round(log2(5),digits=2)`
+Touch location|Gelard||7 |`r round(log2(7),digits=2)`
+line geometry - length|Pollack|||2.6-3
+line geometry - oriantation|Pollack|||2.8-3.3
+line geometry - curvature constant arc length|Pollack|||2.2
+line geometry - curvature constant chord length|Pollack|||1.6
+]
+
+---
+### Stimuli (2)
+- Average channel capacity 2.6 bits
+- SD 0.6 bits
+
+.red[
+This means that if we want users of our visualization systems to be able to extract more than 6 or 7 levels of a data value with accuracy, we must look at other means.
+]
+
+---
+### Multidimensional Stimuli
+
+Does $C_{(A+B)}=C_A+C_B$ ?
+--
+
+
+stimuli | researcher | expected bits |actual bits
+--------|------------|---------------|-----------
+Dot in a square|Klemmer, Frick|6.5|4.6
+salinity and sweetness|Beebe-Center|3.8|2.3
+Loudness and pitch|Pollack|4.8|3.1
+Hue and saturation|Halsey, Chapanis|5.3|3.6
+Size, brightness, hue|Eriksen|7.6|4.1
+Multiple sound parameters|Pollack, Flicks|14|7.2
+---
+### Relative Judgment
+![](images/3_11.png)
+--
+![](images/3_12.png)
+--
+---
+### Error in Perception
+1. position along a common scale
+2. position along identical, nonaligned scales
+3. length
+4. angle/slope (though error depends greatly on orientation and type)
+5. area
+6. volume
+7. color hue, saturation, density (although this was only informal testing)
+
+.red[
+- bar charts and scatterplots are effective tools for communicating quantitative data
+- pie charts are probably not as eﬀective a mechanism,
+]
+---
+### Weber's Law
+- The likelihood of detecting a change is proportional to the relative change, not to the absolute change
+- suppose $x$ is the magnitude of a physical attribute; Let $w_p(x)$ be a positive number such that the magnitude $x+w_p(x)$ is detected with probability $p$ to be differ than $x$
+
+      $w_p(x)=k_px$
+
+      $k_p$ does not depend on $x$
+      
+.scroll-output[
+
+Stimuli | Weber fraction
+--------|---------------
+brightness | 0.079
+Loudness | 0.048
+Finger span | 0.022
+Heaviness | 0.02
+length | 0.029
+Taste, NaCl | 0.083
+Saturation, red | 0.019
+Electric shock | 0.013
+Vibration, 60Hz | 0.036
+
+
+]     
+From: Teghtsoonian(1971)
+
+---
+### Stevens' Law
+- the person's perceived scale is $p(x)=cx^\beta$ where $x$ is the magnitude of the attribute
+- The perceived scale is the actual scale to a power
+
+https://en.wikipedia.org/wiki/Stevens%27s_power_law
+---
+![](images/3_14.png)
+---
+### Expanding Capabilities
+- reconfigure the task to require relative rather than absolute judgments
+- increasing dimensionality
+    - Span of perceptual dimensionality ~ 10 (Miller)
+- sequence of different absolute judgments
+    - absolute judgment limited by the amount of information (bits), STM by chunks
+- Focus and Execution
+    - If users can focus attention their performance can be improved (Chapman, 1932)
+
+---
+### Cognition - Patterson(2014)
+![](images/3_13.png)
+---

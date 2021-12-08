@@ -1,0 +1,840 @@
+---
+title: "ggplot2"
+author: "Gilad Ravid"
+institute: "BGU"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "sup/gilad.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "sup/macros.js"
+---
+.scroll-output-100[
+```{r echo=FALSE, warning=FALSE}
+library(linguisticsdown)
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(readxl)
+library(httr)
+library(tidyverse)
+library(lubridate)
+library(ggmap)
+library(ggrepel)
+library(gridExtra)
+library(pander)
+library(RCurl)
+source("sup/common.r")
+```
+]
+---
+### Grammar of Graphics
+statistical graphic is a mapping from data to aesthetic attributes (colour, shape, size) of geometric objects (points, lines, bars). The plot may also contain statistical transformations of the data and is drawn on a speciﬁc coordinate system. Facetting can be used to generate the same plot for diﬀerent subsets of the dataset.
+
+All plots are composed of:
+- **Data** that you want to visualise and a set of aesthetic **mapping**s describing how variables in the data are mapped to aesthetic attributes that you
+can perceive.
+- **Layers** made up of geometric elements and statistical transformation. Geometric objects, **geom**s for short, represent what you actually see on the plot: points, lines, polygons, etc. Statistical transformations, **stat**s for short, summarise data in many useful ways. For example, binning and counting observations to create a histogram, or summarising a 2d relationship with a linear model.
+- The **scale**s map values in the data space to values in an aesthetic space, whether it be colour, or size, or shape. Scales draw a legend or axes, which provide an inverse mapping to make it possible to read the original data values from the plot.
+---
+- A coordinate system, **coord** for short, describes how data coordinates are mapped to the plane of the graphic. It also provides axes and gridlines to make it possible to read the graph. We normally use a Cartesian coordinate system, but a number of others are available, including polar coordinates and map projections.
+- A **face**ting speciﬁcation describes how to break up the data into subsets and how to display those subsets as small multiples. This is also known as conditioning or latticing/trellising.
+- A **theme** which controls the ﬁner points of display, like the font size and background colour. While the defaults in ggplot2 have been chosen with care, you may need to consult other references to create an attractive plot.
+---
+.scroll-output-100[
+```{r warning=FALSE}
+#GET("https://query.data.world/s/oxy7ahmu5tekxkccbjvcmlg5nhgjhs", write_disk(tf <- tempfile(fileext = ".xlsx")))
+#isr17 <- read_excel(tf)
+
+isr17 <- read_excel("datasets/24_19_057t1.xlsx",sheet = 2,range = "a4:jx260",col_names = TRUE)
+names(isr17)[6]<-"year"
+isr17$year<-as.numeric(isr17$year)
+isr17$age<-as.integer((2021-isr17$year)/10)
+names(isr17)[11]<-"area"
+isr17$area<-as.numeric(isr17$area)
+names(isr17)[13]<-"population"
+isr17$population<-as.numeric(isr17$population)
+names(isr17)[3]<-"district"
+isr17$district<-as.factor(isr17$district)
+names(isr17)[4]<-"status"
+isr17$status<-as.factor(isr17$status)
+names(isr17)[212]<-"cluster"
+names(isr17)[1]<-"c_name"
+isr17$cluster<-as.numeric(isr17$cluster)
+names(isr17)[39]<-"percImmigrants"
+isr17$percImmigrants<-as.numeric(isr17$percImmigrants)
+names(isr17)[89]<-"incomeSecurity"
+isr17$incomeSecurity<-as.numeric(isr17$incomeSecurity)
+isr17$percIncomeSecurity<-isr17$incomeSecurity/(isr17$population*1000)*100
+names(isr17)[145]<-"percMaturityTest"
+isr17$percMaturityTest<-as.numeric(isr17$percMaturityTest)
+
+#xx<-names(isr17)
+isr17_head<-isr17[1:100,]
+ggplot(isr17_head,aes(x=area, y=population))+
+  geom_point()
+
+ggplot(isr17_head,aes(x=area, y=population,colour=district))+
+  geom_point()
+
+ggplot(isr17_head,aes(x=area, y=population,shape=status))+
+  geom_point()
+
+ggplot(isr17_head,aes(x=area, y=population,size=cluster))+
+  geom_point()
+```
+]
+---
+scatterplot defined by:
+1. Data: isr17
+2. Aesthetic mapping: area mapped to x position, population economy to y position.
+3. Layer: points
+---
+.scroll-output-100[
+```{r warning=FALSE}
+ggplot(isr17_head,aes(x=area, y=population))+
+  geom_point(aes(colour="blue"))
+ggplot(isr17_head,aes(x=area, y=population))+
+  geom_point(colour="blue")
+```
+]
+---
+### Facetting
+.scroll-output-100[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point()+
+  facet_wrap(~cluster)
+```
+]
+---
+### Geoms
+- geom_smooth()
+- geom_boxplot()
+- geom_histogram() and geom_freqpoly()
+- geom_bar()
+- geom_path() and geom_line()
+---
+.scroll-output-100[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point()+
+  geom_smooth()
+
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point()+
+  geom_smooth(method="lm")
+```
+]
+---
+### Boxplot and Jittered Pointsr
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=status, y=population))+
+  geom_point()
+
+ggplot(isr17,aes(x=status, y=population))+
+  geom_jitter()
+  
+ggplot(isr17,aes(x=status, y=population))+
+  geom_boxplot()
+
+ggplot(isr17,aes(x=status, y=population))+
+  geom_violin()
+```
+]
+---
+### Histograms and Frequency Polygons
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=population))+
+  geom_histogram()
+
+ggplot(isr17,aes(x=population))+
+  geom_freqpoly()
+
+ggplot(isr17,aes(x=population,colour=district))+
+  geom_freqpoly()
+
+ggplot(isr17,aes(x=population,fill=district))+
+  geom_histogram()+
+  facet_wrap(~district)
+```
+]
+---
+### Bar charts
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=district))+
+  geom_bar()
+
+drugs <- data.frame(
+drug = c("a", "b", "c"),
+effect = c(4.2, 9.7, 6.1)
+)
+
+ggplot(drugs,aes(x=drug,y=effect))+geom_bar(stat="identity")
+ggplot(drugs,aes(x=drug,y=effect))+geom_point()
+```
+]
+---
+### Time Series with line and path plots
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(economics, aes(date, unemploy / pop)) +
+geom_line()
+ggplot(economics, aes(date, uempmed)) +
+geom_line()
+
+ggplot(economics, aes(unemploy / pop, uempmed)) +
+geom_path() +
+geom_point()
+year <- function(x) as.POSIXlt(x)$year + 1900
+ggplot(economics, aes(unemploy / pop, uempmed)) +
+geom_path(colour = "grey50") +
+geom_point(aes(colour = year(date)))
+```
+]
+---
+### Modifying the Axes
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point(alpha=0.3)
+
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point(alpha=0.3)+
+  xlab("settlement area km^2")+
+  ylab("settlement population in 10^3 people")
+
+ggplot(isr17,aes(x=area, y=population))+
+  geom_point(alpha=0.3)+
+  xlab(NULL)+
+  ylab(NULL)
+
+ggplot(isr17,aes(x=status, y=population))+
+  geom_jitter()
+
+a<-"עירייה"
+b<-"מועצה מקומית"
+ggplot(isr17,aes(x=status, y=population))+
+  geom_jitter()+
+  xlim(a,b)+
+  ylim(0,200)
+```
+]
+---
+### Output
+.scroll-output-80[
+```{r warning=FALSE}
+p<-ggplot(isr17,aes(x=area, y=population))+
+  geom_point(alpha=0.3)
+print(p)
+summary(p)
+
+```
+]
+---
+### Toolbox
+Layers
+  - data
+  - summary
+  - metadata
+Plot types
+  - geom_area() - area plot
+  - geom_bar(stat="identity"), geom_col() - bar chart
+  - geom_line geom_path() - line plot
+  - geom_point() - scatterplot
+  - geom_polygon()
+  - geom_rect(), geom_tile(), geom_raster()
+
+https://ggplot2.tidyverse.org/reference/
+
+---
+
+`r columns(4, 1)`
+.scroll-output-100[
+```{r warning=FALSE}
+td <- data.frame(
+x = c(3, 1, 5),
+y = c(2, 4, 6),
+label = c("a","b","c")
+)
+p <- ggplot(td, aes(x, y, label = label)) +
+labs(x = NULL, y = NULL) + # Hide axis label
+theme(plot.title = element_text(size = 12)) # Shrink plot title
+p + geom_point() + ggtitle("point")
+p + geom_text() + ggtitle("text")
+p + geom_bar(stat = "identity") + ggtitle("bar")
+p + geom_tile() + ggtitle("raster")
+
+p + geom_line() + ggtitle("line")
+p + geom_area() + ggtitle("area")
+p + geom_path() + ggtitle("path")
+p + geom_polygon() + ggtitle("polygon")
+
+```
+]
+---
+### Labels
+`r columns(1, 1)`
+.scroll-output-80[
+```{r warning=FALSE}
+td <- data.frame(x = 1, y = 3:1, family = c("sans", "serif", "mono"))
+ggplot(td, aes(x, y)) +
+geom_text(aes(label = family, family = family))
+
+td <- data.frame(x = 1, y = 3:1, face = c("plain", "bold", "italic"))
+ggplot(td, aes(x, y)) +
+geom_text(aes(label = face, fontface = face))
+
+td <- data.frame(
+x = c(1, 1, 2, 2, 1.5),
+y = c(1, 2, 1, 2, 1.5),
+text = c(
+"bottom-left", "bottom-right",
+"top-left", "top-right", "center"
+)
+)
+ggplot(td, aes(x, y)) +
+geom_text(aes(label = text))
+ggplot(td, aes(x, y)) +
+geom_text(aes(label = text), vjust = "inward", hjust = "inward")
+
+td <- data.frame(trt = c("a", "b", "c"), resp = c(1.2, 3.4, 2.5))
+ggplot(td, aes(resp, trt)) +
+geom_point() +
+geom_text(aes(label = paste0("(", resp, ")")), nudge_y = -0.25) +
+xlim(1, 3.6)
+
+ggplot(isr17, aes(x=area, y=population)) +
+geom_text(aes(label = c_name)) 
+
+ggplot(isr17, aes(x=area, y=population)) +
+geom_text(aes(label = c_name), check_overlap = TRUE)
+
+ggplot(isr17, aes(x=area, y=population)) +
+geom_label(aes(label = c_name), check_overlap = TRUE) 
+```
+]
+---
+### Annotations
+geom_text()
+geom_rect()
+geom_line(), geom_path(), geom_segment()
+geom_vline(), geom_hline(), geom_abline()
+
+`r columns(1, 1/4,1)`
+
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(economics, aes(date, unemploy)) +
+geom_line()
+
+presidential <- subset(presidential, start > economics$date[1])
+ggplot(economics) +
+geom_rect(aes(xmin = start, xmax = end,ymin = -Inf, ymax = Inf, fill = party), alpha = 0.2,data = presidential) +
+geom_vline(aes(xintercept = as.numeric(start)),data = presidential,colour = "grey50", alpha = 0.5) +
+geom_text(aes(x = start, y = 2500, label = name),data = presidential,size = 3, vjust = 0, hjust = 0, nudge_x = 50) +
+geom_line(aes(date, unemploy)) +
+scale_fill_manual(values = c("blue", "red"))
+
+yrng <- range(economics$unemploy)
+xrng <- range(economics$date)
+caption <- paste(strwrap("Unemployment rates in the US have \n varied a lot over the years", 40), collapse = "\n")
+ggplot(economics, aes(date, unemploy)) +
+geom_line() +
+annotate("text", x = xrng[1], y = yrng[2], label = caption,hjust = 0, vjust = 1, size = 4)
+         
+ggplot(diamonds, aes(log10(carat), log10(price))) +
+geom_bin2d() +
+facet_wrap(~cut, nrow = 1)
+
+mod_coef <- coef(lm(log10(price) ~ log10(carat), data = diamonds))
+ggplot(diamonds, aes(log10(carat), log10(price))) +
+geom_bin2d() +
+geom_abline(intercept = mod_coef[1], slope = mod_coef[2],colour = "white", size = 1) +
+facet_wrap(~cut, nrow = 1)
+```
+]
+---
+### Collective Geoms
+
+- individual geom - draws a distinct graphical object for each observation
+- A collective geom - displays multiple observations with one geometric object
+
+group aesthetic
+---
+`r columns(1, 2 / 3, 0.6)`
+.scroll-output-100[
+```{r warning=FALSE}
+data(Oxboys,package = "nlme")
+head(Oxboys)
+
+# spaghetti plot
+
+ggplot(Oxboys, aes(age, height, group = Subject)) +
+geom_point() +
+geom_line()
+
+# interaction() for multiple grouping variables
+
+ggplot(Oxboys, aes(age, height, group = Subject)) +
+geom_line() +
+geom_smooth(method = "lm", se = FALSE)
+
+ggplot(Oxboys, aes(age, height)) +
+geom_line(aes(group = Subject)) +
+geom_smooth(method = "lm", size = 2, se = FALSE)
+
+ggplot(Oxboys, aes(Occasion, height)) +
+geom_boxplot()
+
+ggplot(Oxboys, aes(Occasion, height)) +
+geom_boxplot() +
+geom_line(colour = "#3366FF", alpha = 0.5)
+
+ggplot(Oxboys, aes(Occasion, height)) +
+geom_boxplot() +
+geom_line(aes(group = Subject), colour = "#3366FF", alpha = 0.5)
+```
+]
+---
+### Surface Plots
+
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(faithfuld, aes(eruptions, waiting)) +
+geom_contour(aes(z = density, colour = ..level..))
+
+ggplot(faithfuld, aes(eruptions, waiting)) +
+geom_raster(aes(fill = density))
+
+small <- faithfuld[seq(1, nrow(faithfuld), by = 10), ]
+ggplot(small, aes(eruptions, waiting)) +
+geom_point(aes(size = density), alpha = 1/3) +
+scale_size_area()
+```
+]
+---
+### Revealing Uncertainty
+
+* Discrete x, range: `geom_errorbar()`, `geom_linerange()`
+* Discrete x, range & center: `geom_crossbar()`, `geom_pointrange()`
+* Continuous x, range: `geom_ribbon()`
+* Continuous x, range & center: `geom_smooth(stat = "identity")`
+`r columns(3, 1)`
+.scroll-output[
+```{r warning=FALSE}
+y <- c(18, 11, 16)
+df <- data.frame(x = 1:3, y = y, se = c(1.2, 0.5, 1.0))
+
+base <- ggplot(df, aes(x, y, ymin = y - se, ymax = y + se))
+base + geom_crossbar()
+base + geom_pointrange()
+base + geom_smooth(stat = "identity")
+
+base + geom_errorbar()
+base + geom_linerange()
+base + geom_ribbon()
+```
+]
+---
+### Weighted Data
+`r columns(2, 2/3)`
+.scroll-output-80[
+```{r warning=FALSE}
+ggplot(isr17, aes(percIncomeSecurity,percMaturityTest)) + 
+  geom_point()
+
+# Weight by population
+ggplot(isr17, aes(percIncomeSecurity,percMaturityTest)) + 
+  geom_point(aes(size = population)) + 
+  scale_size_area("Population\n(thusands)")
+
+# Unweighted
+ggplot(isr17, aes(percIncomeSecurity,percMaturityTest)) + 
+  geom_point() + 
+  geom_smooth(method = lm, size = 1)
+
+# Weighted by population
+ggplot(isr17, aes(percIncomeSecurity,percMaturityTest)) + 
+  geom_point(aes(size = population)) + 
+  geom_smooth(aes(weight = population), method = lm, size = 1) +
+  scale_size_area(guide = "none")
+
+ggplot(isr17, aes(percIncomeSecurity)) +
+  geom_histogram(binwidth = 1) + 
+  ylab("settlements")
+
+ggplot(isr17, aes(percIncomeSecurity)) +
+  geom_histogram(aes(weight = population), binwidth = 1) +
+  ylab("Population (1000s)")
+```
+]
+---
+### Exploring Minard's 1812 plot with ggplot2
+adapted from https://www.andrewheiss.com
+http://www.datavis.ca/gallery/re-minard.php
+`r columns(1, 1)`
+.scroll-output[
+```{r warning=FALSE, fig.width=10}
+cities <- read.table("https://raw.githubusercontent.com/andrewheiss/fancy-minard/master/input/minard/cities.txt",header = TRUE, stringsAsFactors = FALSE)
+troops <- read.table("https://raw.githubusercontent.com/andrewheiss/fancy-minard/master/input/minard/troops.txt",header = TRUE, stringsAsFactors = FALSE)
+temps <- read.table("https://raw.githubusercontent.com/andrewheiss/fancy-minard/master/input/minard/temps.txt",header = TRUE, stringsAsFactors = FALSE) %>%
+  mutate(date = dmy(date))  # Convert string to actual date
+
+march.1812.plot.simple <- ggplot() +
+  geom_path(data = troops, aes(x = long, y = lat, group = group,
+                               color = direction, size = survivors),
+            lineend = "round") +
+  geom_point(data = cities, aes(x = long, y = lat),
+             color = "#DC5B44") +
+  geom_text_repel(data = cities, aes(x = long, y = lat, label = city),
+                  color = "#DC5B44", family = "Open Sans Condensed Bold") +
+  scale_size(range = c(0.5, 10)) +
+  scale_colour_manual(values = c("#DFC17E", "#252523")) +
+  guides(color = "none", size = "none") +
+  theme_nothing()
+
+# Change the x-axis limits to match the simple map
+temps.nice <- temps %>%
+  mutate(nice.label = paste0(temp, "°, ", month, ". ", day))
+
+temps.1812.plot <- ggplot(data = temps.nice, aes(x = long, y = temp)) +
+  geom_line() +
+  geom_label(aes(label = nice.label),
+            family = "Open Sans Condensed Bold", size = 2.5) +
+  labs(x = NULL, y = "° Celsius") +
+  scale_x_continuous(limits = ggplot_build(march.1812.plot.simple)$layout$panel_ranges[[1]]$x.range) +
+  scale_y_continuous(position = "right") +
+  coord_cartesian(ylim = c(-35, 5)) +  # Add some space above/below
+  theme_bw(base_family = "Open Sans Condensed Light") +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.text.x = element_blank(), axis.ticks = element_blank(),
+        panel.border = element_blank())
+
+# Combine the two plots
+both.1812.plot.simple <- rbind(ggplotGrob(march.1812.plot.simple),
+                               ggplotGrob(temps.1812.plot))
+
+# Adjust panels
+panels <- both.1812.plot.simple$layout$t[grep("panel", both.1812.plot.simple$layout$name)]
+
+# Because this plot doesn't use coord_equal, since it's not a map, we can use
+# whatever relative numbers we want, like a 3:1 ratio
+both.1812.plot.simple$heights[panels] <- unit(c(3, 1), "null")
+
+grid::grid.newpage()
+grid::grid.draw(both.1812.plot.simple)
+
+```
+]
+---
+### Diamonds Data
+.scroll-output[
+```{r warning=T}
+diamonds
+
+# Displaying Distributions
+ggplot(diamonds, aes(depth))+geom_histogram()
+ggplot(diamonds, aes(depth))+geom_histogram(binwidth=0.1)+xlim(55,70)
+ggplot(diamonds, aes(depth)) +geom_freqpoly(aes(colour = cut), binwidth = 0.1, na.rm = TRUE) + xlim(58, 68) + theme(legend.position = "none")
+ggplot(diamonds, aes(depth)) + geom_histogram(aes(fill = cut), binwidth = 0.1, position = "fill", na.rm = TRUE) + xlim(58, 68) + theme(legend.position = "none")
+ggplot(diamonds, aes(depth)) + geom_density(na.rm = TRUE) + xlim(58, 68) + theme(legend.position = "none")
+ggplot(diamonds, aes(depth, fill = cut, colour = cut)) + geom_density(alpha = 0.2, na.rm = TRUE) + xlim(58, 68) + theme(legend.position = "none")
+ggplot(diamonds, aes(clarity, depth)) + geom_boxplot()
+ggplot(diamonds, aes(carat, depth)) + geom_boxplot(aes(group = cut_width(carat, 0.1))) + xlim(NA, 2.05)
+ggplot(diamonds, aes(clarity, depth)) + geom_violin() 
+ggplot(diamonds, aes(carat, depth)) + geom_violin(aes(group = cut_width(carat, 0.1))) + xlim(NA, 2.05)
+```
+]
+---
+### Statistical Summaries
+.scroll-output[
+```{r warning=T}
+ggplot(diamonds, aes(color)) + geom_bar()
+ggplot(diamonds, aes(color, price)) + geom_bar(stat = "summary_bin", fun.y = mean)
+ggplot(diamonds, aes(table, depth)) + geom_bin2d(binwidth = 1, na.rm = TRUE) + xlim(50, 70) + ylim(50, 70)
+ggplot(diamonds, aes(table, depth, z = price)) + geom_raster(binwidth = 1, stat = "summary_2d", fun = mean, na.rm = TRUE) + xlim(50, 70) + ylim(50, 70)
+```
+]
+---
+### Mastering the Grammar
+
+.scroll-output[
+```{r warning=T}
+ggplot(isr17_head,aes(x=area, y=population,colour=district))+ geom_point()
+```
+]
+-positioned according to the value of two variables
+each point also has a size, a color and a shape. These attributes are called aesthetics, and are the properties that can be perceived on the graphic. Each aesthetic can be mapped to a variable, or set to a constant value.
+---
+.scroll-output-100[
+```{r warning=T}
+ggplot(isr17_head, aes(area, population, colour = district)) + geom_line() + theme(legend.position = "none")
+ggplot(isr17_head, aes(area, population, colour = district)) + geom_bar(stat = "identity", position = "identity", fill = NA) + theme(legend.position = "none")
+ggplot(isr17_head, aes(area, population, colour = factor(district))) + geom_point() + geom_smooth(method = "lm")
+```
+]
+---
+### Scaling
+- conversion of data units to graphical units (pixels, colors)
+- cords
+-render all (data, scales, coordinate system, annotations together 
+.scroll-output[
+```{r warning=T}
+ggplot(isr17_head, aes(area, population)) + geom_point() + geom_smooth()+facet_wrap(~status)+scale_x_continuous(trans='log10')+scale_y_continuous(trans='log10')
+```
+]
+---
+.scroll-output-100[
+```{r warning=FALSE}
+eduPic <- as.data.frame(read_excel("datasets/eduPic.xlsx",sheet = 1,col_names = TRUE))
+e2<-as.data.frame(eduPic)
+names(eduPic)
+str<-"לא רלוונטי"
+str2<-"לא מחושב"
+eduPic[eduPic==str|eduPic==str2]<-NA
+names(eduPic)[3]<-"Cname"
+names(eduPic)[4]<-"eshcol"
+names(eduPic)[5]<-"district"
+names(eduPic)[9]<-"numSchools"
+names(eduPic)[16]<-"a2ndDegreePercent"
+names(eduPic)[18]<-"adjustmentsPercent"
+names(eduPic)[35]<-"rateBagrut"
+names(eduPic)[46]<-"a5pntMathPercent"
+names(eduPic)[53]<-"classSizeHigh"
+
+eduPic$a2ndDegreePerecnt<-as.numeric(eduPic$a2ndDegreePercent)
+eduPic$a5pntMathPercent<-as.numeric(eduPic$a5pntMathPercent)
+eduPic$adjustmentsPercent<-as.numeric(eduPic$adjustmentsPercent)
+eduPic$rateBagrut<-as.numeric(eduPic$rateBagrut)
+eduPic$classSizeHigh<-as.numeric(eduPic$classSizeHigh)
+
+a<-eduPic %>%
+  group_by(eshcol) %>%
+  summarise(adjRate=mean(adjustmentsPercent,na.rm=T))
+b<-eduPic %>%
+  group_by(district) %>%
+  summarise(adjRate=mean(adjustmentsPercent,na.rm=T))
+```
+]
+---
+### Building plot layer by layer
+.scroll-output-80[
+```{r warning=T}
+p<-ggplot(isr17,aes(x=area,y=population))
+p
+p+geom_point()
+
+p + layer(mapping = NULL,data = NULL,geom = "point",stat = "identity",position = "identity")
+
+eduPic_R<-eduPic[!(is.na(eduPic$a5pntMathPercent)),]
+
+model<-loess(a5pntMathPercent~a2ndDegreePerecnt,data=eduPic_R)
+grid<-tibble(a2ndDegreePerecnt=seq(min(eduPic_R$a2ndDegreePercent),max(eduPic_R$a2ndDegreePercent),length=50))
+grid$a5pntMathPercent<-predict(model,newdata = grid)
+std_resid<-resid(model)/model$s
+outliner<-filter(eduPic_R,abs(std_resid)>2)
+
+ggplot(mapping=aes(x=a2ndDegreePerecnt,y=a5pntMathPercent))+geom_point(data=eduPic_R)+geom_line(data=grid)+geom_text(data=outliner, aes(label=Cname,vjust = 1.5))
+
+```
+]
+- Never refer to a variable with $ (e.g., eduPic$cName) in aes()
+---
+.scroll-output-100[
+```{r warning=T}
+ggplot(eduPic,aes(x=a2ndDegreePerecnt,y=a5pntMathPercent,color=district))+geom_point()
+ggplot(eduPic,aes(x=a2ndDegreePerecnt,y=a5pntMathPercent))+geom_point(aes(color=district))
+ggplot(eduPic,aes(x=a2ndDegreePerecnt))+geom_point(aes(y=a5pntMathPercent,color=district))
+ggplot(eduPic)+geom_point(aes(x=a2ndDegreePerecnt,y=a5pntMathPercent,color=district))       
+```
+]
+---
+.scroll-output-80[
+```{r }
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent))+geom_point(aes(color=district))+geom_smooth(method="lm", se=FALSE)+theme(legend.position="none")
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent,color=district))+geom_point()+geom_smooth(method="lm", se=FALSE)+theme(legend.position="none")
+```
+]
+- If you want appearance to be governed by a variable, put the speciﬁcation inside aes(); if you want override the default size or colour, put the value outside of aes().
+---
+.scroll-output-100[
+```{r warning=T}
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent))+geom_point(colour="darkblue")
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent))+geom_point(aes(colour="darkblue"))
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent))+geom_point(aes(colour="darkblue"))+ scale_color_identity()
+
+#naming color to constant
+ggplot(eduPic,aes(a2ndDegreePerecnt,a5pntMathPercent))+geom_point()+
+  geom_smooth(aes(colour="loess"),method="loess",se=FALSE)+
+  geom_smooth(aes(colour="lm"),method="lm",se=FALSE)+
+  labs(colour="Method")
+
+```
+]
+---
+### Geoms
+
+https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf
+
+- Geoms
+- Stats (& stat_spoke, stat_function)
+---
+.scroll-output-80[
+```{r }
+ggplot(isr17,aes(x=age,y=population))+geom_point()+stat_summary(geom="point",fun="mean",color="red",size=4)
+ggplot(isr17,aes(x=age,y=population))+geom_point()+geom_point(stat="summary",fun="mean",color="red",size=4)
+ggplot(isr17, aes(population))+geom_histogram(binwidth=25)
+ggplot(isr17, aes(population))+geom_histogram(aes(y=..density..),binwidth=25)
+ggplot(isr17, aes(population))+geom_histogram(aes(y=..ncount..),binwidth=25)
+```
+]
+- position
+---
+### Scale & Guides
+```{r }
+ggplot(isr17,aes(x=age,y=population))+geom_point()+scale_x_continuous("My Label")
+```
+
+scale_{aesthetic}_{scale type}
+scale_type continuous, discrete, brewer
+
+Axis|Legend|Argument name
+----|------|-------------
+Label|Title|name
+Ticks& Grid Line|Key|breaks
+Tick label|Key label|labels
+---
+.scroll-output-100[
+```{r warning=T}
+df <- data.frame(x = 1:2, y = 1, z = "a")
+p <- ggplot(df, aes(x, y)) + geom_point(aes(color=z))
+p + scale_x_continuous("X axis")
+p + xlab("X axis") + ylab("Y axis")
+p + labs(x = "X axis", y = "Y axis", colour = "Colour\nlegend")
+p + labs(x = "", y = "")
+p + labs(x = NULL, y = NULL)
+
+df <- data.frame(x = c(1, 3, 5) * 1000, y = 1)
+axs <- ggplot(df, aes(x, y)) +
+geom_point() +
+labs(x = NULL, y = NULL)
+axs
+axs + scale_x_continuous(breaks = c(2000, 4000))
+axs + scale_x_continuous(breaks = c(2000, 4000), labels = c("2k", "4k"))
+
+leg <- ggplot(df, aes(y, x, fill = x)) +
+geom_tile() +
+labs(x = NULL, y = NULL)
+leg
+leg + scale_fill_continuous(breaks = c(2000, 4000))
+leg + scale_fill_continuous(breaks = c(2000, 4000), labels = c("2k", "4k"))
+
+df2 <- data.frame(x = 1:3, y = c("a", "b", "c"))
+ggplot(df2, aes(x, y)) +
+geom_point()
+ggplot(df2, aes(x, y)) +
+geom_point() +
+scale_y_discrete(labels = c(a = "apple", b = "banana", c = "carrot"))
+
+axs + scale_x_continuous(breaks = NULL)
+axs + scale_x_continuous(labels = NULL)
+
+leg + scale_fill_continuous(breaks = NULL)
+leg + scale_fill_continuous(labels = NULL)
+
+df <- data.frame(x = c(2, 3, 5, 10, 200, 3000), y = 1)
+ggplot(df, aes(x, y)) +
+geom_point() +
+scale_x_log10()
+
+mb <- as.numeric(1:10 %o% 10^(0:4))
+ggplot(df, aes(x, y)) +
+geom_point() +
+scale_x_log10(minor_breaks = log10(mb))
+```
+]
+---
+.scroll-output-100[
+```{r warning=T}
+df<-data.frame(x=c(1,2,3),y=c(1,2,3),z=c("1","2","3"))
+ggplot(df, aes(y, y)) + geom_point(size = 4, colour="grey20") + geom_point(aes(colour = z),size=2)
+ggplot(df, aes(y, y)) + geom_point(size = 4, colour="grey20", show.legend=TRUE) + geom_point(aes(colour = z),size=2)
+
+norm <- data.frame(x = rnorm(1000), y = rnorm(1000))
+norm$z <- cut(norm$x, 3, labels = c("a", "b", "c"))
+ggplot(norm, aes(x, y)) +
+geom_point(aes(colour = z), alpha = 0.1)
+ggplot(norm, aes(x, y)) +
+geom_point(aes(colour = z), alpha = 0.1) +
+guides(colour = guide_legend(override.aes = list(alpha = 1)))
+
+#df<-data.frame(x=c(1,2,3),y=c(1,2,3),z=c(1,2,3))
+
+ggplot(df, aes(x, y)) + geom_point(aes(colour = z))
+ggplot(df, aes(x, y)) + geom_point(aes(shape = z))
+ggplot(df, aes(x, y)) + geom_point(aes(shape = z, colour = z))
+
+df <- data.frame(x = 1:3, y = 1:3, z = c("a", "b", "c"))
+base <- ggplot(df, aes(x, y)) +
+geom_point(aes(colour = z), size = 3) +
+xlab(NULL) +
+ylab(NULL)
+base + theme(legend.position = "right") # the default
+base + theme(legend.position = "bottom")
+base + theme(legend.position = "none")
+
+base <- ggplot(df, aes(x, y)) +
+geom_point(aes(colour = z), size = 3)
+base + theme(legend.position = c(0, 1), legend.justification = c(0, 1))
+base + theme(legend.position = c(0.5, 0.5), legend.justification = c(0.5, 0.5))
+base + theme(legend.position = c(1, 0), legend.justification = c(1, 0))
+
+```
+]
+---
+.scroll-output-100[
+```{r warning=T}
+df <- data.frame(x = 1, y = 1:3, z = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_raster(aes(fill = z))
+base
+base + scale_fill_continuous(guide = guide_legend())
+base + guides(fill = guide_legend())
+
+df <- data.frame(x = 1, y = 1:4, z = letters[1:4])
+p <- ggplot(df, aes(x, y)) + geom_raster(aes(fill = z))
+p
+p + guides(fill = guide_legend(ncol = 2))
+p + guides(fill = guide_legend(ncol = 2, byrow = TRUE))
+
+p <- ggplot(df, aes(1, y)) + geom_bar(stat = "identity", aes(fill = z))
+p
+p + guides(fill = guide_legend(reverse = TRUE))
+```
+]
+
+---
+.scroll-output-100[
+```{r warning=T}
+df <- data.frame(x = 1:3, y = 1:3)
+base <- ggplot(df, aes(x, y)) + geom_point()
+base
+base + scale_x_continuous(limits = c(1.5, 2.5))
+
+base + scale_x_continuous(limits = c(0, 4))
+
+base + xlim(0, 4)
+base + xlim(4, 0)
+base + lims(x = c(0, 4))
+
+```
+]

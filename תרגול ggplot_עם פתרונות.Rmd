@@ -1,0 +1,544 @@
+---
+title: "Untitled"
+author: "Gilad Ravid"
+date: "11/14/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+תרגול ב ggplot
+
+בתרגילים אלו נשתמש בסדרות נתונים המסופקים עם חבילת ggplot2 . ניתן לראות את כל סדרות הנתונים על ידי הפקודה data(package = "ggplot2")
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+```
+
+1.  כיצד תתארו את היחס בין cty ל hwy (נתוני mpg)? האם ישם בעיה בהסקת מסקנות מגרף זה?
+To understand the relationship, we need to make a plot:
+```{r e.2.3.1.1_cty_hwy_plot}
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+```
+
+It appears that there is a positive linear relationship between cty and hwy. 
+
+2.  מה הנתונים שהגרף
+ ggplot(mpg, aes(model, manufacturer)) + geom point()
+מראה? האם זה שימושי? כיצד ניתן לשנות את הנתונים ו/או הגרף על מנת להפוך אותו לאינפורמטיבי יותר?
+```{r e.2.3.1.2_manu_model_plot}
+ggplot(mpg, aes(model, manufacturer)) +
+  geom_point()
+```
+
+This plot has problems. First, the x-axis names in model are too long, that the plot doesn't
+show all the full names. This makes it impossible for people to understand. Second, this plot
+doesn't really help people understand the relationship between model and manufacturer for the
+manufacturer may have several models such as e.g. audi and camry.
+
+A better approach is to check a manufacturer+model combination count
+
+```{r e.2.3.1.2_manu_model}
+df <- mpg %>%
+  mutate(manuModel = paste(manufacturer, model, sep = " "))
+
+df  %>%
+  select(manufacturer, model, manuModel)
+
+ggplot(df, aes(x = manuModel)) +
+  geom_bar() +
+  coord_flip()
+```
+
+3.  תאר את הנתונים, אסטתיקה, מיפוי ושכבות המשמשים בכל אחד מהגרפים הבאים
+ggplot(mpg, aes(cty, hwy)) + geom point()
+ggplot(diamonds, aes(carat, price)) + geom point()
+ggplot(economics, aes(date, unemploy)) + geom line()
+ggplot(mpg, aes(cty)) + geom histogram()
+
+```{r e.2.3.1.3_summry_plot}
+summary(ggplot(mpg, aes(cty, hwy)) + geom_point())
+```
+As you can see, we can use summary() function to get full details about a chunk of
+plot codes. But in general, the codes above has one dataset, mapping to two variables
+in that data set, and has one layer of plots.
+
+
+4.  מה קורה כאשר ממפים משתנה רציף לאסטתיקת colour, size? ומה קורב במשתנה קטגוריאלי? מה קורה כאשר משתמשים ביותר מאסטתיקה אחת?
+
+Using mpg dataset as an example, first I map color, shape, and size to continuous 
+variables:
+```{r e.2.4.1.1_plot1}
+ggplot(mpg, aes(cty, hwy, color = +displ)) +
+  geom_jitter()
+```
+What you get is a color scale, which you can use +/- sign to change the direction of
+color scale.
+
+But the problem is that, color and size might work with continuous variables, but shape
+doesn't. Because the various numbers could deplete the current availble shapes that 
+represent them.
+```{r e.2.4.1.1_plot2, eval=FALSE}
+ggplot(mpg, aes(cty, hwy, shape = displ)) +
+  geom_point()
+
+# You get:
+# Error: A continuous variable can not be mapped to shape
+```
+
+You can use more than one aesthetic in a plot, such as:
+```{r e.2.4.1.1_plot3}
+ggplot(mpg, aes(cty, hwy, size = displ, color = displ)) +
+  geom_point()
+```
+
+
+5.  מה קורה כאשר ממפים משתנה רציף לצורה ? למה? מה קורה כאשר ממפים את המשתנה trans (מנתוני mpg) לצורה? למה?
+
+The first part has been answered in the previous question.
+The second part to map trans to shape:
+```{r e.2.4.1.2}
+ggplot(mpg, aes(cty, hwy, shape = trans)) +
+  geom_point()
+```
+
+The plot generates a warning that shape for more than 6 discrete values becomes hard to discriminate.
+
+
+6.  כיצד הנעת הרכב (drv) קשורה לצריכת הדלק בעיר?
+
+```{r e.2.4.1.3_plot1}
+ggplot(mpg, aes(drv, cty)) + 
+  geom_boxplot() +
+  scale_x_discrete(labels = c("Front wheel", "Rear wheel", "Four wheel"),
+                   limits = c("f", "r", "4"))
+```
+
+Four wheel appears to be most efficient for city miles per gallon.
+
+For drive train, engine size, and class, we need to reorder the class based on engine size first
+with median, and then plot class on x-axis and engine size on y-axis, with drive train as color.
+```{r e.2.4.1.3_plot2}
+ggplot(mpg, aes(reorder(class, displ, FUN = median), displ, color = drv)) +
+  geom_jitter(width = 0.5)
+```
+7. כיצד הנעת הרכב קשורה לגודל המנוע (displ) וסוג הרכב?
+  
+  
+  
+8. מה קורה כאשר מיצרים לוחות  (facet) למשתנה רציף כמו hwy? ומה קורה ב cyl? מה ההבדלים?
+  
+```{r e.2.5.1.1_plot1}
+ggplot(mpg, aes(x = cty, y = displ)) +
+  geom_point() +
+  facet_wrap(~ hwy)
+```
+
+When you run facet_wrap(~continuous) with continuous variable, the whole plot becomes hard to
+grasp because there are too many graphs.
+
+Then we try to run the same thing with cyl:
+
+```{r e.2.5.1.1_plot2}
+ggplot(mpg, aes(displ, cty)) +
+  geom_point() +
+  facet_wrap(~ cyl)
+```
+
+With cyl, which only has four different values, this picture is much easier to read. The key
+difference is that hwy has way too many variation in values than cyl does.
+  
+  
+9.  השתמש בלוחות כדי לחקור את הקשר בין צריכת דלק, גודל מנוע, ומספר צלינדרים. כיצד השימוש בלוחות לפי מספר צלינדרים משנה את ההערכתם?
+
+The pattern can be seen in the last plot.
+
+10. מה הבעיה עם התרשים שנוצר על ידי
+ggplot(mpg, aes(cty, hwy)) + geom point()
+כיצד ניתן לפתור זאת?
+
+```{r e.2.6.6.1_plot1}
+ggplot(mpg, aes(cty, hwy)) +
+  geom_point()
+```
+
+The problem with this plot is that, there is overplotting, so that this graph doesn't show all the
+availble data points in the dataset.
+
+The solution to this problem is to use geom_jitter().
+```{r e.2.6.6.1_plot2}
+ggplot(mpg, aes(cty, hwy)) +
+  geom_jitter()
+```
+
+11.  חקור את ההתפלגות של המשתנה carat בסט נתוני diamonds. איזה binwidth חושף את הצורה המעניינת ביותר
+
+We can generate several plots with different binwidth:
+```{r e.2.6.6.3_plot1}
+ggplot(diamonds, aes(carat)) +
+  geom_bar(binwidth = 1) +
+  ggtitle(expression(atop("Carat Barplot with", "binwidth = 1"))) +
+  xlab("Carat") +
+  ylab("Count/Number") +
+  theme(plot.title = element_text(hjust = 0.5), title = element_text(size = 14),
+        text = element_text(size = 9))
+```
+
+As we change the binwidth:
+```{r e.2.6.6.3_plot2}
+ggplot(diamonds, aes(carat)) +
+  geom_histogram(binwidth = 0.5) +
+  ggtitle(expression(atop("Carat Barplot with", "binwidth = 0.5"))) +
+  xlab("Carat") +
+  ylab("Count/Number") +
+  theme(plot.title = element_text(hjust = 0.5), title = element_text(size = 14),
+        text = element_text(size = 9))
+```
+
+```{r r e.2.6.6.3_plot3}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 0.01) +
+  ggtitle(expression(atop("Carat Barplot with", "binwidth = 0.01"))) +
+  xlim(0.3, 3) +
+  xlab("Carat") +
+  ylab("Count/Number") +
+  theme(plot.title = element_text(hjust = 0.5), title = element_text(size = 14),
+        text = element_text(size = 9))
+```
+
+I am not familiar with diamonds industry, but the pattern looks interesting and there must be
+a reason for this pattern.
+
+12.  חקור את התפלגות משתנה המחיר בנתוני היהלומים. כיצד ההתפלגות משתנה לפי cut?
+
+To check this::
+```{r e.2.6.6.4_plot1}
+ggplot(diamonds, aes(x = cut, y = price, color = cut)) +
+  geom_boxplot()
+```
+
+```{r e.2.6.6.4_plot2}
+ggplot(diamonds, aes(x = price, y =..density.., color = cut)) +
+  geom_freqpoly(binwidth = 200)
+```
+
+
+Fair cut diamonds have higher price than very good cut. One of the reasons could be
+these fair diamonds are big in terms of their sizes, so people are likely to spend
+money for the size than for the cut, because not everyone is an expert in diamonds.
+
+
+13. צייר בוקספלוט ל hwy לכל ערך של cyl, nckh kvpul t, בטך לפקטור. איז אסטיקה נוספת היית צריך להוסיף?
+
+```{r e.3.5.5.1}
+ggplot(mpg, aes(cyl, hwy, group = cyl)) +
+  geom_boxplot()
+```
+
+You simply add a "group = cyl" argument within the overall aes in ggplot()
+
+14. שנה את הפקודה
+ggplot(mpg, aes(displ, cty)) + geom_boxplot()
+כך שיהיה בוקספלוט לכל ערך שלם של displ
+
+```{r e.3.5.5.2}
+ggplot(mpg, aes(displ, cty)) +
+  geom_boxplot(aes(group = displ))
+```
+
+15. כמה עמודות בכל אחד מהגרפים הבאים
+ggplot(mpg, aes(drv)) +geom_bar()
+ggplot(mpg, aes(drv, fill = hwy, group = hwy)) +geom_bar()
+library(dplyr)
+mpg2 <- mpg %>% arrange(hwy) %>% mutate(id = seq_along(hwy))
+ggplot(mpg2, aes(drv, fill = hwy, group = id)) +geom_bar()
+
+```{r}
+ggplot(mpg, aes(drv)) + geom_bar(colour="white")
+ggplot(mpg, aes(drv, fill = hwy, group = hwy)) + geom_bar(colour="white")
+library(dplyr)
+mpg2 <- mpg %>% arrange(hwy) %>% mutate(id = seq_along(hwy))
+ggplot(mpg2, aes(drv, fill = hwy, group = id)) + geom_bar(colour="white")
+```
+
+All have 3 bars.
+
+
+
+16. תקן את הגרף שנוצר מהפקודות הבאות. מה הבעיה בגרף?
+library(babynames)
+hadley <- dplyr::filter(babynames, name == "Hadley")
+ggplot(hadley, aes(year, n)) +
+geom_line()
+
+```{r e.3.5.5.5}
+library(babynames)
+hadley <- dplyr::filter(babynames, name == "Hadley")
+ggplot(hadley, aes(year, n)) +
+geom_line()
+```
+We want to see the growth of the new born babies with name called "Hadley". This graph doesn't
+show the full picture, and the shape of the line is not a good representation of the number of names
+we want to see. In addition, if you check the data, the count is separated by sex(gender). As a
+result, this line plot cannot show us the full details of the name Hadley's number's variation
+across the years. Starting in 1960s, there are female babies named as "Hadley".
+```{r e.3.5.5.5_plot}
+hadley
+male <- hadley %>%
+  filter(sex == "M")
+male
+
+female <- hadley %>%
+  filter(sex == "F")
+female
+
+ggplot(hadley) +
+  geom_line(aes(year, n, color = sex))
+```
+
+17. העזר בפקודה
+class <- mpg %>% group_by(class) %>% summarise(n = n(), hwy = mean(hwy))
+על מנת לייצר את הגרף
+
+```{r e.5.3.1.2}
+class <- mpg %>% group_by(class) %>% summarise(n = n(), hwy = mean(hwy))
+ggplot(mpg, aes(class, hwy))  +
+  geom_jitter(width = 0.05, size = 2) +
+  geom_point(aes(y = hwy), data = class, size = 4, color = "red") +
+  geom_text(aes(y = 10, label = paste0("n = ", n)), data = class)
+```
+
+The process behind the scene:
+First, you use the ggplot() function to define the main dataset and aesthetics you want to use. Here, we want to plot the hwy(y-axis) as points against class(x-axis). This is the first line of code.
+
+Second, remember, ggplot2 works by plotting a graph layer by layer. The second line of code is the first layer that we are going to add. Instead of a scatterplot using geom_point(), we want to use jitter plot to avoid overplotting in geom_point(). Here, we are using the same dataset - mpg, and using the same aesthetics (x = class, y = hwy) as we indicated in ggplot(), so we do not change anything. But, to make it look similar to the original plot in the textbook, we want to squeeze the width = 0.05 (or you can adjust this number to 0.1, 0.2 to take a look), and we can add a size = 2 or 1 or 3, it doesn't matter.
+
+Third, we want to create the same red dots in the original graph. This red dot, is the third layer. Here I used geom_point() because these red dots are basically points. However, red dots means the mean value of the y values on corresponding x values. In the original dataset mpg, we do not have this variable. So, here in the second layer of red dots, we need to reset some of the aesthetics and data. We want aesthetics to have y=hwy, this is the same as the ggplot(), but we change the dataset so data = class. Now, the layer knows that each class matches 1 y-axis value which is the hwy as mean value. We have the red dots there, but we also want to shape the size so it looks big, and color to red.
+
+Finally, to add the layer of labels. Any annotation, we use geom_text() layer to do it. We set the aes(y = 10), because this sets the height of the label near position of y = 10. Then we want to set the label value. But here, we only know the n, which is the count. But in the original graph, it is n = integer. So we need to use the paste0() function to concatenate string and numbers. write, label = paste0("n = ", n) to have an effect of n = integer, then, we set the data = class, because we are not using the original mpg.
+
+
+
+
+
+
+18. פשט את הגדרות הגרפים הבאים
+ggplot(mpg) + geom_point(aes(mpg$disp, mpg$hwy))
+ggplot() +geom_point(mapping = aes(y = hwy, x = cty), data = mpg) +geom_smooth(data = mpg, mapping = aes(cty, hwy))
+ggplot(diamonds, aes(carat, price)) +geom_point(aes(log(brainwt), log(bodywt)), data = msleep)
+
+```{r e.5.4.3.1_1}
+ggplot(mpg, aes(displ, hwy)) + geom_point()
+```
+
+```{r e.5.4.3.1_2}
+ggplot(mpg) + geom_point(aes(cty, hwy)) + geom_smooth(aes(cty, hwy))
+```
+
+```{r e.5.4.3.1_3}
+ggplot(aes(log(brainwt), log(bodywt)), data = msleep) + geom_point()
+```
+
+19. מה עושה הקוד הבא. האם הוא עובד? האם הוא הגיוני? למה/למה לא?
+ggplot(mpg) +geom_point(aes(class, cty)) +geom_boxplot(aes(trans, hwy))
+
+```{r}
+ggplot(mpg) + geom_point(aes(class, cty)) + geom_boxplot(aes(trans, hwy)) + coord_flip()
+```
+
+This plot is using mpg dataset as a blank background without setting aesthetics. Then
+it adds the first layer using scatterplot with class as x-axis and cty on y axis.
+After that, it adds another layer using boxplot with trans on x-axis and hwy on y-axis.
+
+It doesn't work because the x-axis: 1. too crowded, need to add coord_flip() to read all
+the class and trans labels. 2. Trans and class are mixed together, it doesn't make sense.
+Also, boxplot is mixed with scatterplot. Y-axis has two different value groups, the hwy 
+and the cty. These two contain both continuous values but are different in nature because one
+is city miles per gallon, the other is highway miles per gallon.
+In the end, the x-axis and y-axis labels only have class and cty, it doesn't label trans
+and hwy.
+
+
+20. מה קורה כאשר מנסים בשכבה אחת להשתמש במשתנה רציף ולאחר מכן בשכבה אחרת במשתנה קטגוריאלי? מה קורה עם עושים זאת בסדר הפוך
+
+
+```{r e.5.4.3_2}
+ggplot(mpg) +
+  geom_point(aes(drv, cty)) +
+  geom_point(aes(hwy, cyl))
+```
+
+If you set first x-axis with categorical values, and then with continuous values, the plot
+will run but the result doesn't make sense at all. However, if you do it the opposite way,
+R will report errors.
+
+21. באיזה geom תשתמש בכל אחד מהמצבים הבאים: א. לתאר השתנות משתנה לאורך הזמן ב. לתאור התפלגות משתנה יחיד ג. למקד את תשומת הלב במגמה הכללית בסט נתונים גדול ג. לצייר מפה ד. לשיים (לשים תוויות) על נקודות חריגות
+
+-Display how a variable has changed over time.
+geom_line()
+-Show the detailed distribution of a single variable.
+geom_histogram()
+-Focus attention on the overall trend in a large dataset.
+geom_line(), geom_area()
+-Draw a map.
+geom_sf(), geom_polygon(), coord_quickmap()    
+-Label outlying points.
+geom_point(), geom_text()
+
+22. מה קורה כאשר משייכים משתנה דיסקרטי לסקאלה רציפה? מה קורה כאשר משייכים משתנה רציף לסקאלה דיסקרטית?
+
+Pair a discrete variable to continuous scale:
+```{r e.6.2.1.1_plot1}
+ggplot(mpg, aes(displ, hwy)) +
+geom_point() +
+scale_x_continuous() +
+scale_y_continuous()
+```
+```{r e.6.2.1.1_plot2}
+ggplot(mpg, aes(displ, hwy)) +
+geom_point() +
+scale_x_discrete() +
+scale_y_discrete()
+```
+
+Let's compare the two graphs. The first plot used both scale_x_continuous() and scale_y_continuous().
+The second plot used scale_x_discrete() and scale_y_discrete for both axes. The difference between
+the two graphs doesn't lie within the positions of the points, but the background and the units on
+the two axes. If you use discrete for continuous, you won't see the hwy units on the y-axis, nor will
+you see the units for displ on x-axis.
+
+On the other hand, we can try continuous scale on discrete variables:
+```{r e.6.2.1.1_plot3}
+ggplot(mpg, aes(class, hwy)) +
+  geom_jitter(width = 0.05, height = 0.05)
+```
+
+Now we change the scale on the previous plot:
+```{r e.6.2.1.1_plot4, eval=FALSE}
+ggplot(mpg, aes(class, hwy)) +
+  geom_jitter(width = 0.05, height = 0.05) +
+  scale_x_continuous()
+# Error: Discrete value supplied to continuous scale
+```
+
+We were not allowed to do so because of the error message: Discrete value
+supplied to continuous scale.
+
+So in conclusion, we could supply discrete scale to continuous variables, but not
+vice versa.
+
+
+23. פשט את הגרפים הבאים שיהיו קלים להבנה
+ggplot(mpg, aes(displ)) +scale_y_continuous("Highway mpg") +scale_x_continuous() + geom_point(aes(y = hwy))
+
+ggplot(mpg, aes(y = displ, x = class)) +scale_y_continuous("Displacement (l)") + scale_x_discrete("Car type") +scale_x_discrete("Type of car") + scale_colour_discrete() + geom_point(aes(colour = drv)) +scale_colour_discrete("Drive\ntrain")
+
+The codes can be simplified as below:
+
+```{r e.6.2.1.2_plot1}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  ylab("Highway mpg")
+```
+
+This can be simplified down to:
+```{r e.6.2.1.2_plot2}
+ggplot(mpg, aes(class, displ)) +
+  geom_point(aes(color = drv)) +
+  labs(x = "Type of car", y = "Displacement (l)", colour = "Drive\ntrain")
+```
+
+24. שחזר את הגרף הבא, סדר את תווית ציר y כך שהסוגריים יהיו בגודל הנכון
+
+```{r e.6.3.3.1}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_x_continuous("Displacement",
+                     breaks = c(2,3,4,5,6,7),
+                     labels = c("2k", "3k", "4k", "5k", "6k", "7k")) +
+  scale_y_continuous(quote(Highway (Miles/Gallon)))
+```
+
+
+
+25. שחזר את הגרף הבא:
+
+
+```{r e.6.3.3.3}
+ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point() +
+  scale_color_discrete(labels = c("4wd", "fwd", "rwd"))
+```
+
+
+26. מה הבעיה בגרף המיוצר באמצעות
+ggplot(mpg, aes(displ, hwy)) +geom_point(aes(colour = drv, shape = drv)) + scale_colour_discrete("Drive train")
+כיצד ניתן לתקן זאת?
+
+The plot created two legends on the right-hand side, where you could just use one.
+
+Here, quoting from the book:"In order for legends to be merged, they must have the same name. So if you
+change the name of one of the scales, you’ll need to change it for all of them."
+
+As a result, here, the original plot sets only colour with new name, while shape doesn't have
+the same new name, the result is that these two legends cannot merge. There are two ways to fix this
+plot:
+
+```{r e.6.4.4.2_plot1}
+ggplot(mpg, aes(displ, hwy)) +
+geom_point(aes(color = drv, shape = drv)) +
+  labs(color = "Drive train", shape = "Drive train")
+```
+
+```{r e.6.4.4.2_plot2}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(colour = drv, shape = drv)) + 
+  scale_colour_discrete("Drive train") +
+  scale_shape_discrete("Drive train")
+```
+
+
+27. צור את הגרף
+
+
+
+
+
+
+
+
+28. הקוד הבא מייצר שני גרפים. שנה את הקוד כך שהצירים והמקרא יהיו זהים (אין להשתמש ב facets)
+fwd <- subset(mpg, drv == "f")
+rwd <- subset(mpg, drv == "r")
+ggplot(fwd, aes(displ, hwy, colour = class)) + geom_point()
+ggplot(rwd, aes(displ, hwy, colour = class)) + geom_point()
+
+Use exactly expand_limits() function to set both plots' legend title to have all types
+of drv with the same set of colors.
+
+We can also set the xlim and ylim so that both plots have the same axes scales. But this
+is optional.
+
+```{r, e.6.5.1.1_plot1}
+fwd <- subset(mpg, drv == "f")
+rwd <- subset(mpg, drv == "r")
+ggplot(fwd, aes(displ, hwy, colour = class)) + 
+  geom_point() +
+  scale_color_discrete("Drive train") +
+  xlim(0, 10) +
+  ylim(0, 45) +
+  expand_limits(color = c("2seater", "compact", "midsize", "minivan",
+                                   "pickup", "subcompact", "suv"))
+```
+
+```{r, e.6.5.1.1_plot2}
+ggplot(rwd, aes(displ, hwy, colour = class)) + 
+  geom_point() +
+  scale_color_discrete("Drive train")+
+  xlim(0, 10) +
+  ylim(0, 45) +
+  expand_limits(color = c("2seater", "compact", "midsize", "minivan",
+                                   "pickup", "subcompact", "suv"))
+```

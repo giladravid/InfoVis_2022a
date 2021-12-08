@@ -1,0 +1,422 @@
+---
+title: "Untitled"
+author: "Gilad Ravid"
+date: "11/18/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+# One Dataset, Visualized 25 Ways
+## This is what happens when you let the data ramble on and on and on…
+based on https://flowingdata.com/2017/01/24/one-dataset-visualized-25-ways/
+
+# “Let the data speak.”
+
+```{r setup}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+#remotes::install_github("yaweige/ggpcp", build_vignettes = TRUE)
+library(ggpcp)
+```
+```{r dataPrep}
+# https://data.worldbank.org/indicator/SP.DYN.LE00.FE.IN
+
+setwd("~/Dropbox (BGU)/courses/InfoVis_2022a")
+
+le <- read.csv("datasets/LifeExpec.csv",header = TRUE)
+leM <- read.csv("datasets/LifeExpecMale.csv",header = TRUE)
+leF <- read.csv("datasets/LifeExpecFemale.csv",header = TRUE)
+
+names(le)[3:62]<-substr(names(le)[3:62],2,6)
+names(leM)[3:62]<-substr(names(leM)[3:62],2,6)
+names(leF)[3:62]<-substr(names(leF)[3:62],2,6)
+
+leLong<- le %>% pivot_longer(cols=3:62,names_to="year",values_to = "total")
+leMLong<- leM %>% pivot_longer(cols=3:62,names_to="year",values_to = "male")
+leFLong<- leF %>% pivot_longer(cols=3:62,names_to="year",values_to = "female")
+
+leLong$male<-leMLong$male
+leLong$female<-leFLong$female
+
+leLong$year<-as.numeric(leLong$year)
+
+leDiff <- leLong %>% 
+  group_by(Country.Code) %>% 
+  arrange(year) %>%
+  mutate(diff=(total - lag(total,n=1,default=first(total)))*100/lag(total,n=1,default=first(total)),
+         prevTot=lag(total,n=1,default=first(total)))
+
+leDiff_2019<-leDiff[leDiff$year==2019,]
+meanTotal2019<-mean(leDiff_2019$total,na.rm=T)
+leDiff_2019<-leDiff_2019 %>% 
+  mutate(AvgDiff=(total - meanTotal2019),pos=AvgDiff>0)
+```
+
+\newpage
+
+```{r p1}
+p1<-ggplot(leLong,aes(x=year,y=total,group=Country.Code))+geom_line()+ 
+  ggtitle("Life Expectancy at Birth, 1960-2019 \n Each line represents a country") +
+  xlab("") + ylab("")
+p1
+```
+
+## Looks like spaghetti
+
+\newpage
+
+```{r p2,fig.width = 25, fig.height= 30}
+p2<-ggplot(leLong,aes(x=year,y=total))+
+  geom_line()+facet_wrap(~Country.Name,ncol=20)+
+  ggtitle("Life Expectancy at Birth, 1960-2019") + 
+  theme(strip.text.x = element_text(size = 6),axis.title = element_blank(), 
+        axis.text.y = element_blank(),axis.ticks = element_blank(),
+        axis.text.x = element_blank(),axis.ticks.x = element_blank(),
+        panel.border = element_blank(),panel.background=element_blank(),
+        panel.grid.major = element_blank(),panel.grid.minor = element_blank())
+p2
+```
+
+## Shows countries separately so that lines don’t overlap
+
+\newpage
+
+```{r p3,fig.width = 25, fig.height= 30}
+p3<-ggplot(leDiff_2019,aes(x=reorder(Country.Name, total),y=total))+
+  geom_bar(stat = "identity")+
+  coord_flip()+
+  ggtitle("Life Expectancy at Birth,2019")+xlab("")+ylab("")
+p3
+```
+
+## No surprises
+
+\newpage
+
+```{r p4,fig.width = 25, fig.height= 30}
+p4<-ggplot(leDiff_2019)+
+  geom_segment(aes(x=male,xend=female,y=reorder(Country.Name, total),
+                   yend=reorder(Country.Name, total)))+
+  ggtitle("Life Expectancy at Birth For Males and Females,2019")+
+  xlab("")+
+  ylab("")
+p4
+```
+
+## Focus on the the difference between the two genders, with comparison across countries
+
+\newpage
+
+```{r p5,fig.width = 25, fig.height= 30}
+p5<-ggplot(leLong,aes(x=year))+
+  geom_line(aes(y=male))+
+  geom_line(aes(y=female))+
+  facet_wrap(~Country.Name,ncol=10)+
+  ggtitle("Life Expectancy at Birth for Male and Female, 1960-2019") + 
+  theme(strip.text.x = element_text(size = 4),axis.title = element_blank(), 
+        axis.text.y = element_blank(), axis.text.x = element_blank(),
+        panel.border = element_blank())
+p5
+```
+
+## Focus on difference between male and female over time
+
+\newpage
+
+```{r p6,fig.width = 25, fig.height= 30}
+names(le)[4]<-"X1961"
+names(le)[62]<-"X2019"
+p6<-ggplot(le)+
+  geom_segment(aes(x=X1961,xend=X2019,y=reorder(Country.Name, X2019),
+                   yend=reorder(Country.Name, X2019)))+
+  ggtitle("Life Expectancy at Birth 1961 vs. 2019")+
+  xlab("")+
+  ylab("")
+p6
+```
+
+## A focus the change between two time periods instead of the fluctuations
+
+\newpage
+
+```{r p7}
+p7<-ggplot(leDiff_2019,aes(x=male,y=female))+
+  geom_point()+
+  ggtitle("Life Expectancy at Birth for Males and Female, 2019")+
+  xlab("Male")+
+  ylab("Female")
+p7
+```
+
+## Comparison between the two, in a more compact space
+```{r p7b}
+p7b<-ggplot(leDiff_2019) + 
+  geom_pcp(aes(vars=vars(male,female,total)))
+p7b
+```
+\newpage
+
+```{r p8}
+p8<-ggplot(leLong,aes(x=male,y=female,group=Country.Code))+
+  geom_line()+
+  theme(legend.position = "none")+
+  ggtitle("Life Expectancy at Birth for Males vs. Female, 1960-2019")+
+  xlab("Male")+
+  ylab("Female")
+p8
+```
+
+## Shows changes over time, although not super clear with this dataset
+```{r p8a}
+p8<-ggplot(leLong[1:500,],aes(x=male,y=female,group=Country.Code))+
+  geom_line(aes(colour=Country.Code))+
+  theme(legend.position = "none")+
+  ggtitle("Life Expectancy at Birth for Males vs. Female, 1960-2019")+
+  xlab("Male")+
+  ylab("Female")
+p8
+```
+
+\newpage
+
+
+
+\newpage
+
+```{r p9,fig.width = 25, fig.height= 30}
+p9<-ggplot(leLong,aes(x=male,y=female))+
+  geom_line()+
+  facet_wrap(~Country.Name,ncol=10)+
+  ggtitle("Life Expectancy at Birth for Male vs. Female, 1960-2019") + 
+  theme(strip.text.x = element_text(size = 4),axis.title = element_blank(), 
+        axis.text.y = element_blank(), axis.text.x = element_blank(),
+        panel.border = element_blank())
+p9
+
+```
+
+## Unjumbles the lines for better visibility, but harder to see overall patterns because of size
+
+\newpage
+
+```{r p10}
+p10<-ggplot(leDiff,aes(x=year,y=diff,group=Country.Code))+
+  geom_line()+
+  ggtitle("Life Expectancy at Birth Year over Year Percentage Change, 1960-2019")+
+  xlab("")+
+  ylab("")
+p10
+```
+
+## Places emphasis on the annual changes instead of the actual values
+
+\newpage
+
+```{r p11,fig.width = 25, fig.height= 30}
+p11<-ggplot(leDiff,aes(x=year,y=diff))+
+  geom_line()+
+  facet_wrap(~Country.Name,ncol=10)+
+  ggtitle("Life Expectancy at Birth % Change from Previous Year, 1960-2019") + 
+  theme(strip.text.x = element_text(size = 4),axis.title = element_blank(), 
+        axis.text.y = element_blank(), axis.text.x = element_blank(),
+        panel.border = element_blank())
+p11
+```
+
+## Most patterns obscured by large values
+
+\newpage
+
+```{r p12}
+p12<-ggplot(leDiff[leDiff$Country.Code %in% c("ISR","KHM","RWA","TLS","IRN","ZMB")
+                   & leDiff$year>1969 & leDiff$year<1991,],aes(x=year,y=1))+
+  geom_point(aes(colour=diff,size=5))+
+  facet_wrap(~Country.Name,ncol=3)+
+  scale_colour_gradient2(low = "#870ec2",mid="#ffffff",high = "#3c930f",space = "Lab",
+                         na.value = "grey50",guide = "colourbar",aesthetics = "colour")+
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"),
+        axis.title = element_blank(), axis.text.y = element_blank())+
+  ggtitle("Life Expectancy at Birth Change from Previous Year, 1960-2019")
+p12
+```
+
+# Focusing on a handful of countries with larger fluctuations
+
+\newpage
+
+```{r p13,fig.width = 25, fig.height= 30}
+p13<-ggplot(leDiff_2019,aes(x=1,y=1,size=total))+ 
+  geom_point()+
+  facet_wrap(~Country.Name,ncol=10)+
+  theme(strip.text.x = element_text(size = 4),axis.title = element_blank(), 
+        axis.text.y = element_blank(),axis.ticks = element_blank(), 
+        axis.text.x = element_blank(),axis.ticks.x = element_blank(),
+        panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  ggtitle("Life Expectancy at Birth in 2019")
+p13
+```
+
+## One bubble for each country in 2019
+
+\newpage
+
+```{r p14 ,fig.width = 25, fig.height= 30}
+p14<-ggplot(leLong,aes(x=year,y=Country.Name,fill=total))+
+  geom_tile()+
+  ggtitle("Life Expectancy at Birth in 1960-2019")
+p14
+```
+
+## Shows everything in a more compact space, but with less distinct separation for countries
+
+\newpage
+
+```{r p15}
+p15<-ggplot(leLong,aes(x=year,y=total,group=Country.Code))+
+  geom_line(color="orange",alpha=0.2)+
+  coord_polar()+
+  ggtitle("Life Expectancy at Birth in 1960-2019")+
+  xlab("")+
+  ylab("")
+p15
+```
+
+## Mostly for show, but some sense of distribution
+
+\newpage
+
+```{r p16}
+p16<-ggplot(leLong,aes(x=as.factor(year),y=total))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("")+
+  ylab("Years")
+p16
+```
+
+## The classics, focusing on spread
+
+\newpage
+
+```{r p17,fig.width = 25, fig.height= 30}
+p17<-ggplot(leLong,aes(x=total))+
+  geom_histogram()+
+  facet_wrap(~year,ncol=5)+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("years")+
+  ylab("Count")
+p17
+```
+
+## Focus on distributions for each year instead of individual countries
+
+\newpage
+
+```{r p18,fig.width = 25, fig.height= 30}
+p18<-ggplot(leLong,aes(x=total))+
+  geom_density()+
+  facet_wrap(~year,ncol=5)+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("years")+
+  ylab("Density")
+p18
+```
+
+## Smooth versions of histograms, but a bit more difficult to decipher
+
+\newpage
+
+```{r p19}
+p19<-ggplot(leLong[leLong$year>2009,],aes(x=as.factor(year),y=total))+
+  geom_dotplot(binaxis='y', stackdir='center',stackratio=0.9, dotsize=0.2)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("")+
+  ylab("")
+p19
+```
+
+## Get an idea of spread and still get some individuality
+
+\newpage
+
+```{r p20}
+p20<-ggplot(leLong[leLong$year>2009,],aes(x=as.factor(year),y=total))+
+  geom_violin(trim=FALSE)+
+  geom_dotplot(binaxis='y', stackdir='center',stackratio=0.9, dotsize=0.2)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("")+
+  ylab("")
+p20
+```
+
+## Combining charts is an option too
+
+\newpage
+
+```{r p21,fig.width = 25, fig.height= 30}
+p21<-ggplot(leLong,aes(x=total))+
+  geom_histogram()+geom_histogram(aes(y=-..count..))+
+  coord_flip()+facet_wrap(~year,ncol=5)+
+  scale_y_continuous(labels=c("50","25","0","25","50"), breaks=c(-25,-12.5,0,12.5,25), 
+                     limits=c(-50,50))+
+  ggtitle("Life Expectancy at Birth\nDistribution of Coutries, 1960-2019")+
+  xlab("Years")+
+  ylab("")
+p21
+```
+
+## Like histograms in this case, but rotated and centered horizontally  
+
+\newpage
+
+```{r p22,fig.width = 25, fig.height= 30}
+p22<-ggplot(leDiff_2019,aes(x=reorder(Country.Name,AvgDiff)))+
+  geom_col(aes(y=AvgDiff,fill=pos))+
+  coord_flip()+
+  ggtitle("Life Expectancy at Birth\nCompared to the Global Average, 2019")+
+  xlab("")+
+  ylab("Years")+
+  theme(legend.position = "none")
+p22
+```
+## Focus on how each country compares to the rest of the world overall
+
+\newpage
+
+```{r saveToFile,eval=FALSE}
+ggsave(plot = p2, width = 25, height = 30, dpi = 300, filename = "p2.pdf",limitsize=F)
+ggsave(plot = p3, width = 25, height = 30, dpi = 300, filename = "p3.pdf",limitsize=F)
+ggsave(plot = p4, width = 25, height = 30, dpi = 300, filename = "p4.pdf",limitsize=F)
+ggsave(plot = p5, width = 20, height = 40, dpi = 300, filename = "p5.pdf",limitsize=F)
+ggsave(plot = p6, width = 10, height = 40, dpi = 300, filename = "p6.pdf",limitsize=F)
+ggsave(plot = p9, width = 20, height = 40, dpi = 300, filename = "p9.pdf",limitsize=F)
+ggsave(plot = p11, width = 20, height = 40, dpi = 300, filename = "p11.pdf",limitsize=F)
+ggsave(plot = p13, width = 20, height = 40, dpi = 300, filename = "p13.pdf",limitsize=F)
+ggsave(plot = p14, width = 10, height = 40, dpi = 300, filename = "p14.pdf",limitsize=F)
+ggsave(plot = p17, width = 20, height = 20, dpi = 300, filename = "p17.pdf",limitsize=F)
+ggsave(plot = p18, width = 20, height = 20, dpi = 300, filename = "p18.pdf",limitsize=F)
+ggsave(plot = p21, width = 20, height = 40, dpi = 300, filename = "p21.pdf",limitsize=F)
+ggsave(plot = p22, width = 10, height = 40, dpi = 300, filename = "p22.pdf",limitsize=F)
+```
+
+\newpage
+
+ - These are more sketches than they are finished graphics.
+ - Data often has a lot — sometimes too much — to say.
+ - The right way
+
+    - Ask the data questions.
+    - Start with the visualization basics.
+    - Focus.
+    - Iterate
+    - Practice
+    - let the data speak
+
+
+
