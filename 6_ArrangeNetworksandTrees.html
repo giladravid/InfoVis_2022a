@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Arrange Networks and Trees</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <meta name="date" content="2021-12-06" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Arrange Networks and Trees
+## Lesson 6
+### Gilad Ravid
+### BGU
+### 2021-12-06
+
+---
+
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```
+## 
+## Attaching package: 'data.table'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     between, first, last
+```
+
+```
+## Registered S3 method overwritten by 'GGally':
+##   method from   
+##   +.gg   ggplot2
+```
+---
+### Connection: Line Marks
+- Nodes are drawn as point marks and the links connecting them are drawn as line marks
+- Triangular vertical node-link layout
+    - root on top
+    - leaves on the bottom
+    - depth in the tree -&gt; vertical spatial
+- Spline radial layout
+    - depth in the tree -&gt; distance from the center
+![](images/TM_23.png)
+---
+![](images/TM_24.png)
+---
+.scroll-output-100[
+
+```r
+library(network)
+```
+
+```
+## 
+## 'network' 1.17.1 (2021-06-12), part of the Statnet Project
+## * 'news(package="network")' for changes since last version
+## * 'citation("network")' for citation information
+## * 'https://statnet.org' for help, support, and other information
+```
+
+```r
+library(igraph)
+```
+
+```
+## 
+## Attaching package: 'igraph'
+```
+
+```
+## The following objects are masked from 'package:network':
+## 
+##     %c%, %s%, add.edges, add.vertices, delete.edges, delete.vertices,
+##     get.edge.attribute, get.edges, get.vertex.attribute, is.bipartite,
+##     is.directed, list.edge.attributes, list.vertex.attributes,
+##     set.edge.attribute, set.vertex.attribute
+```
+
+```
+## The following object is masked from 'package:gtools':
+## 
+##     permute
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     as_data_frame, groups, union
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     decompose, spectrum
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     union
+```
+
+```r
+library(ggraph)
+library(graphlayouts)
+data(flo)
+iflo=graph_from_adjacency_matrix(flo, mode = "undirected")
+autograph(iflo)
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+```r
+palette &lt;- c("#1A5878", "#C44237", "#AD8941", "#E99093", 
+                 "#50594B", "#8968CD", "#9ACD32")
+
+# compute a clustering for node colors
+V(iflo)$clu &lt;- as.character(membership(cluster_louvain(iflo)))
+
+# compute degree as node size
+V(iflo)$size &lt;- degree(iflo)
+ggraph(iflo,layout = "stress")+
+  geom_edge_link0(edge_colour = "grey66")+
+  geom_node_point(aes(fill = clu,size = size),shape = 21)+
+  geom_node_text(aes(filter = size &gt;= 26, label = name),family="serif")+
+  scale_fill_manual(values = palette)+
+  scale_size(range = c(1,6))+
+  theme_graph()+
+  theme(legend.position = "none")
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-2-2.png)&lt;!-- --&gt;
+]
+---
+### Force Directed Placemnet
+- many variants
+- positioned according to a simulation of physical forces where nodes push away from each other while links act like springs that draw their endpoint nodes closer to each other
+
+```r
+help(layout_)
+```
+- usualy start with random placemnet
+- Force-directed network layout idioms typically do not directly use spatial position to encode attribute values.
+- nondeterministic method
+
+idiom | Force-Directed Placement
+------|-------------
+What:Data| Netwrok
+How:Encode|Point marks for nodes, connection marks for links.
+Why:Tasks|Explore topology, locate paths
+Scale|Nodes: dosen-hundreds. Links: hunderds. Node/link density L&lt; 4N
+---
+- minimize line crossings,
+- maintain a pleasing aspect ratio,
+- minimize the total area of the drawing,
+- minimize the total length of the edges,
+- minimize the number of bends in the edges,
+- minimize the number of distinct angles or curvatures used,
+- strive for a symmetric structure.
+- maximize angles between edges
+---
+.scroll-output-100[
+
+```r
+library(igraph)
+library(intergraph)
+a&lt;-network::read.paj(file = "datasets/GiladFaceBook.net")
+
+aIgraph&lt;-asIgraph(a)
+aIgraph&lt;-as.undirected(aIgraph, mode = "collapse")
+
+l &lt;- layout_with_kk(aIgraph)
+plot(aIgraph,vertex.size=2,vertex.label=NA, rescale=F,layout = l*0.4)
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+```r
+col&lt;-rep("red",gsize(aIgraph))
+col[largest_cliques(aIgraph)[[1]]]&lt;-"green"
+col[206]
+```
+
+```
+## [1] "green"
+```
+
+```r
+plot(aIgraph,vertex.size=2,vertex.label=NA, vertex.color=col,rescale=F,layout = l*0.2)
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-4-2.png)&lt;!-- --&gt;
+
+```r
+census &lt;- sna::clique.census(a, mode = "graph")
+
+col&lt;-rep("red",gsize(aIgraph))
+col[which(coreness(aIgraph)==13)]&lt;-"green"
+plot(aIgraph,vertex.size=2,vertex.label=NA, vertex.color=col,rescale=F,layout = l*0.2)
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-4-3.png)&lt;!-- --&gt;
+
+```r
+eb&lt;-edge.betweenness.community (aIgraph)
+modularity(aIgraph,eb$membership)
+```
+
+```
+## [1] 0.4581777
+```
+
+```r
+col&lt;-rep("red",gsize(aIgraph))
+col[which(eb$membership==1)]&lt;-"green"
+plot(aIgraph,vertex.size=2,vertex.label=NA, vertex.color=col,rescale=F,layout = l*0.2)
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-4-4.png)&lt;!-- --&gt;
+]
+---
+### Scalable force directed placement (sfdp)
+- convert large network to simple one. place the simple network. add the rest of the network
+![](images/TM_26.png)
+---
+idiom |Multilevel Force-Directed Placement (sfdp)
+------|-------------
+What:Data| Network
+What:Derived|Cluster hierarchy atop original network.
+How:Encode|Point marks for nodes, connection marks for links.
+Why:Tasks|Explore topology, locate paths and clusters
+Scale|Nodes: 1000–10,000. Links: 1000–10,000. Node/link density: L &lt; 4N.
+---
+### Matrix View
+- adjacency matrix
+.scroll-output-100[
+
+```r
+# V(aIgraph)$comm &lt;- membership(optimal.community(aIgraph))
+V(aIgraph)$comm &lt;- membership(edge.betweenness.community(aIgraph))
+V(aIgraph)$degree &lt;- degree(aIgraph)
+V(aIgraph)$closeness &lt;- centralization.closeness(aIgraph)$res
+V(aIgraph)$betweenness &lt;- centralization.betweenness(aIgraph)$res
+V(aIgraph)$eigen &lt;- centralization.evcent(aIgraph)$vector
+V(aIgraph)$id&lt;-1:209
+node_list &lt;- get.data.frame(aIgraph, what = "vertices")
+edge_list &lt;- get.data.frame(aIgraph, what = "edges") %&gt;%
+  inner_join(node_list %&gt;% select(id, comm), by = c("from" = "id")) %&gt;%
+  inner_join(node_list %&gt;% select(id, comm), by = c("to" = "id")) %&gt;%
+  mutate(group = ifelse(comm.x == comm.y, comm.x, NA) %&gt;% factor())
+all_nodes &lt;- sort(node_list$id)
+plot_data &lt;- edge_list %&gt;% mutate(
+        to = factor(to, levels = all_nodes),
+        from = factor(from, levels = all_nodes))
+```
+]
+---
+.scroll-output-100[
+
+```r
+ggplot(plot_data, aes(y = from, x = to, fill = group)) +
+      geom_raster() +
+      theme_bw() +
+      scale_x_discrete(drop = FALSE) +
+      scale_y_discrete(drop = FALSE) +
+      theme(
+        axis.text.x = element_text(angle = 270, hjust = 0),
+        aspect.ratio = 1,
+        legend.position = "none")
+```
+
+```
+## Warning: Raster pixels are placed at uneven horizontal intervals and will be
+## shifted. Consider using geom_tile() instead.
+```
+
+```
+## Warning: Raster pixels are placed at uneven vertical intervals and will be
+## shifted. Consider using geom_tile() instead.
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+```r
+name_order &lt;- (node_list %&gt;% arrange(comm))$id
+plot_data &lt;- edge_list %&gt;% mutate(
+        to = factor(to, levels = name_order),
+        from = factor(from, levels = name_order))
+ggplot(plot_data, aes(y = from, x = to, fill = group)) +
+      geom_raster() +
+      theme_bw() +
+      scale_x_discrete(drop = FALSE) +
+      scale_y_discrete(drop = FALSE) +
+      theme(
+        axis.text.x = element_text(angle = 270, hjust = 0),
+        aspect.ratio = 1,
+        legend.position = "none")
+```
+
+```
+## Warning: Raster pixels are placed at uneven horizontal intervals and will be
+## shifted. Consider using geom_tile() instead.
+
+## Warning: Raster pixels are placed at uneven vertical intervals and will be
+## shifted. Consider using geom_tile() instead.
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-6-2.png)&lt;!-- --&gt;
+]
+---
+idiom |Adjacency Matrix View
+------|-------------
+What:Data| Network
+What:Derived|Table: network nodes as keys, link status between two nodes as values.
+How:Encode|Area marks in 2D matrix alignment.
+Scale|Nodes: 1000. Links: one milllion.
+
+- Node link diagram is by far the most popular way to visualize networks
+- for sufﬁciently small networks they are extremely intuitive for supporting many of the abstract tasks that pertain to network data.
+- Their weakness is that past a certain limit of network size and link density, they become impossible to read
+- matrix views is perceptual scalabale for both large and dense networks.
+- the matrix view is predictible, stable, support reordering
+- support search
+- unfamilier
+- findig specific type of nodes structure
+- MV lack of support for investigating topological structure
+---
+![](images/TM_27.png)
+---
+### Containment: Hierarchy Marks
+Treemaps
+- heirarchical relationships are shown with containment rather than connection
+- all the children of a tree node are enclosed within the area allocated that node
+
+.scroll-output[
+
+```r
+p &lt;- ggplot(G20, aes(area = 1, label = country, subgroup = hemisphere,
+                     subgroup2 = region, subgroup3 = econ_classification)) +
+  geom_treemap()+
+  geom_treemap_subgroup3_border(colour = "blue", size = 1) +
+  geom_treemap_subgroup2_border(colour = "white", size = 3) +
+  geom_treemap_subgroup_border(colour = "red", size = 5) +
+  geom_treemap_subgroup_text(place = "middle",colour = "red",alpha = 0.5,grow = T) +
+  geom_treemap_subgroup2_text(colour = "white",alpha = 0.5,fontface = "italic") +
+  geom_treemap_subgroup3_text(place = "top", colour = "blue", alpha = 0.5) +
+  geom_treemap_text(colour = "white", place = "middle", reflow = T)
+p
+```
+
+![](6_ArrangeNetworksandTrees_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+---
+![](images/TM_28.png)
+idiom |Treemaps
+------|-------------
+What:Data| Tree.
+How:Encode|Area marks and containment, with rectilinear layout.
+Why:Tasks|Query attributes at leaf nodes
+Scale|Leaf nodes: one million. Links: one million.
+---
+![](images/TM_29.png)
+---
+[2021](http://mozart.diei.unipg.it/gdcontest/contest2021/index.php?id=results)
+[2020](http://mozart.diei.unipg.it/gdcontest/contest2020/results.html)
+[2019](http://mozart.diei.unipg.it/gdcontest/contest2019/results.html)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="sup/macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

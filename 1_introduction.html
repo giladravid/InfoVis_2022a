@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <meta name="date" content="2021-10-17" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction
+## Lesson 1
+### Gilad Ravid
+### BGU
+### 2021-10-17
+
+---
+
+.scroll-output[
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```
+## ── Attaching packages ──────────────────────────────────────────────────────────────────────────── tidyverse 1.3.1 ──
+```
+
+```
+## ✓ tibble  3.1.5     ✓ purrr   0.3.4
+## ✓ tidyr   1.1.4     ✓ stringr 1.4.0
+## ✓ readr   2.0.2     ✓ forcats 0.5.1
+```
+
+```
+## ── Conflicts ─────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+```
+
+```
+## 
+## Attaching package: 'lubridate'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+```
+
+```
+## Google's Terms of Service: https://cloud.google.com/maps-platform/terms/.
+```
+
+```
+## Please cite ggmap if you use it! See citation("ggmap") for details.
+```
+
+```
+## 
+## Attaching package: 'gridExtra'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+```
+
+```
+## 
+## Attaching package: 'RCurl'
+```
+
+```
+## The following object is masked from 'package:tidyr':
+## 
+##     complete
+```
+]
+---
+### Lesson Goals
+
+- Why to use visualization
+- How visualization applied to problem solving
+- The process of visualization
+---
+### Definitions
+- Visualization is the communication of information using graphical representation
+ 
+- visualization noun
+vi··su··al··i··za··tion | \ ˌvi-zhə-wə-lə-ˈzā-shən  , ˌvi-zhə-lə-, ˌvizh-wə-lə- \
+  1. formation of mental visual images
+
+  2. the act or process of interpreting in visual terms or of putting into visible form
+
+  3. the process of making an internal organ or part visible by the introduction (as by swallowing) of a radiopaque substance followed by radiography
+  
+- Computer-based visualization systems provide visual representations of datasets designed to help people carry out tasks more effectively.
+
+(https://www.merriam-webster.com/dictionary/visualization)
+---
+### A Picture is Worth a Thousand Words
+.right[![](images/1_1.png)]
+
+- Wealth of information
+- Quickly processed
+  - Parallel processing with human perceptual system
+- (can be) Independent of local language or culture 
+---
+
+### Vis. is Anywhere
+&lt;img src="images/1_2.png" width="200" /&gt;&lt;img src="images/1_3.png" width="200" /&gt;&lt;img src="images/1_4.png" width="200" /&gt;&lt;img src="images/1_6.jpeg" width="200" /&gt;
+---
+###  Vis. is Anywhere (2)
+&lt;img src="images/1_5.png" width="200" /&gt;&lt;img src="images/1_7.png" width="200" /&gt;&lt;img src="images/1_8.png" width="200" /&gt;&lt;img src="images/1_9.jpg" width="200" /&gt;&lt;img src="images/1_10.png" width="200" /&gt;
+---
+###  Vis. is Anywhere (3)
+&lt;img src="images/1_11.jpeg" width="1000" height="450px" /&gt;
+---
+### Tufte Definition
+ Graphical excellence is the well-designed presentation of interesting data—a matter of substance, of statistics, and of design. ... [It] consists of complex ideas communicated with clarity, precision, and efficiency. ... [It] is that which gives to the viewer the greatest number of ideas in the shortest time with the least ink in the smallest space. ... [It] is nearly always multivariate. ... Graphical excellence requires telling the truth about the data. (Tufte 1983, 51)
+---
+### Open Questions
+- Why visualizations have a richer description then textual form? 
+- In what kinds of situations are visualizations eﬀective?
+- What types of information can and cannot be visualized?
+- How many different ways are there to show the same data?
+- Which ones are best for particular circumstances?
+- Why should we study visualization?
+---
+### Same or Different?
+
+.scroll-output[
+
+```r
+mydf=read.csv("datasets/corona_deceased_ver_00138.csv",header=T)
+mydf$Time_between_positive_and_death=as.numeric(mydf$Time_between_positive_and_death)
+mydf$Time_between_positive_and_hospitalization=as.numeric(mydf$Time_between_positive_and_hospitalization)
+mydf$Length_of_hospitalization=as.numeric(mydf$Length_of_hospitalization)
+mydf$gender=as.factor(mydf$gender)
+mydf$Age_group=as.factor(mydf$Age_group)
+
+plot1&lt;-ggplot(mydf,aes(x=Time_between_positive_and_hospitalization, y=Time_between_positive_and_death,color=gender)) +
+  geom_point()
+plot1+scale_x_continuous(limits=c(-500,10000),labels = NULL)+scale_y_continuous(limits=c(0,4000),labels = NULL)
+plot1+scale_x_continuous(limits=c(-300,300),labels = NULL)+scale_y_continuous(limits=c(0,2000),labels = NULL)
+plot1+scale_x_continuous(limits=c(-2000,2000),labels = NULL)+scale_y_continuous(limits=c(0,300),labels = NULL)
+plot1+scale_x_continuous(limits=c(-300,300),labels = NULL)+scale_y_continuous(limits=c(0,300),labels = NULL)
+plot1+scale_x_continuous(limits=c(-300,300),labels = NULL)+scale_y_continuous(limits=c(-100,300),labels = NULL,trans="log10")
+```
+
+&lt;img src="1_introduction_files/figure-html/unnamed-chunk-5-1.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-5-2.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-5-3.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-5-4.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-5-5.png" width="50%" style='max-width: 3in' /&gt;
+]
+---
+### Same or Different? (2)
+
+.scroll-output[
+
+```r
+plot1&lt;-ggplot(mydf,aes(x=Time_between_positive_and_hospitalization, y=Time_between_positive_and_death,color=gender)) +
+  geom_point()
+plot1+scale_x_continuous(limits=c(-500,10000))+scale_y_continuous(limits=c(0,4000))
+plot1+scale_x_continuous(limits=c(-300,300))+scale_y_continuous(limits=c(0,2000))
+plot1+scale_x_continuous(limits=c(-2000,2000))+scale_y_continuous(limits=c(0,300))
+plot1+scale_x_continuous(limits=c(-300,300))+scale_y_continuous(limits=c(0,300))
+plot1+scale_x_continuous(limits=c(-300,300))+scale_y_continuous(limits=c(-100,300),trans="log10")
+```
+
+&lt;img src="1_introduction_files/figure-html/unnamed-chunk-6-1.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-6-2.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-6-3.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-6-4.png" width="50%" style='max-width: 3in' /&gt;&lt;img src="1_introduction_files/figure-html/unnamed-chunk-6-5.png" width="50%" style='max-width: 3in' /&gt;
+]
+---
+### Influence of Data Display Format
+![:scale 75%](images/1_12.png)
+
+.small[
+From: Elting, L. S., Martin, C. G., Cantor, S. B., Rubenstei, E. B. (1999) Influence of data display formats on physician investigators' decisions to stop clinical trials: prospective trial with repeated measures. BMJ, 318( 7197), 1527-1531
+]
+
+---
+### Organizational Chart
+![:scale 75%](images/1_13.png)
+
+.small[
+From: https://www.kfar-saba.muni.il/uploads/n/1628075616.3487.pdf
+]
+---
+### History of Vis.
+https://www.datavis.ca/milestones
+
+![:scale 75%](https://upload.wikimedia.org/wikipedia/commons/1/1e/Lascaux_painting.jpg)
+
+.small[
+Lascaux cave ~17,000 year ago
+]
+---
+### Kish Table
+![](https://upload.wikimedia.org/wikipedia/commons/a/a9/Tableta_con_trillo.png)
+
+.small[
+Kish Table, 3200 BC
+]
+---
+### Hieroglyphics
+![:scale 70%](images/1_14.jpg)
+
+.small[
+Hieroglyphs on the temple at ancient Ombos, near modern Kawm Umbu, Egypt.
+]
+
+- logograms
+- phonograms
+- determinatives
+---
+### Tabula Peutingeriana
+![:scale 50%](https://upload.wikimedia.org/wikipedia/commons/e/e9/Part_of_Tabula_Peutingeriana.jpg)
+
+.small[
+Tabula Peutingeriana ~1300 AC
+]
+---
+### Hereford Mappa Mundi
+![:scale 50%](https://upload.wikimedia.org/wikipedia/commons/4/48/Hereford-Karte.jpg)
+.small[
+~1300 AC
+]
+---
+### John Snow's Map
+![:scale 50%](images/1_15.png)
+
+.small[
+1854
+]
+---
+### Valentine Seaman's Map of Yellow Fever Epidemic in New York City
+![:scale 30%](https://upload.wikimedia.org/wikipedia/commons/1/14/Valentine_Seaman%27s_map_of_yellow_fever_epidemic_in_New_York_City_%28Plate_2_of_2%29.jpg)
+
+.small[1798]
+---
+### Abu Rayhan Muhammad Ibn Ahmad al-Biruni
+![:scale 75%](https://upload.wikimedia.org/wikipedia/commons/6/62/Lunar_eclipse_al-Biruni.jpg)
+
+.small[Kitab al-Qanun al-Mas’udi ~1030]
+---
+### Somnium Scripionus (Cicero)
+![](images/1_16.png)
+
+.small[~10-11 cnetrury AC]
+---
+### Charles Joseph Minard
+![](https://upload.wikimedia.org/wikipedia/commons/2/29/Minard.png)
+
+"Probably the best statistical graphic ever drawn" (Edward Tufte)
+
+.small[1869]
+---
+### William Playfair
+![:scale 75%](https://upload.wikimedia.org/wikipedia/commons/5/52/Playfair_TimeSeries-2.png)
+
+.small[1786]
+---
+### Joseph Priestley
+![](https://upload.wikimedia.org/wikipedia/commons/7/74/A_New_Chart_of_History.jpg)
+
+.small[1765]
+---
+### Florence Nightingale
+![](images/1-16.jpg)
+.small[1858]
+
+
+---
+### Leonardo da Vinci
+![:scale 40%](https://upload.wikimedia.org/wikipedia/commons/0/04/Leonardo_da_Vinci_-_Anatomical_studies_of_the_shoulder_-_WGA12824.jpg)
+
+.small[1510]
+---
+# Visualization Today
+
+---
+### Israel Railways
+![:scale 30%](https://www.rail.co.il/Documents/Maps/map_no_legend.jpg)
+
+---
+### NTA
+![:scale 50%](https://www.nta.co.il/sites/default/files/styles/large/public/neta-3lines_5.png)
+
+---
+### Google Maps
+![:scale 75%](images/1_28.jpg)
+
+---
+### TA-35 Index
+![:scale 75%](images/1_20.png)
+
+---
+### ECG
+![:scale 75%](https://upload.wikimedia.org/wikipedia/commons/1/18/Normal_12_lead_EKG.jpg)
+
+---
+### Scientific Research
+![](images/1_21.png)
+
+.small[Longer Online Reviews are not Necessarily Better (Fink et. al. 2018)]
+---
+### Outliners
+- Jackman, R. M. (1980). The impact of outliers on income inequality. American Sociological Review, 45, 344–47.
+- Hewitt, C. (1977). The effect of political democracy and social democracy on equality in industrial societies: A cross-national comparison. American Sociological Review, 42, 450–64.
+![](images/1_28.png)
+
+---
+### Correlation vs. distribution
+
+.scroll-output[
+&lt;img src="1_introduction_files/figure-html/unnamed-chunk-7-1.png" width="65%" height="600px" style='max-width: 3.9in' style="display: block; margin: auto;" /&gt;
+]
+---
+### What Makes Bad Figures Bad?
+- Bad Taste
+    - maximize data-ink ratio
+    - memorable vs. interpretable
+- Bad Data
+- Bad Perception
+    - Tufte's Lie factor
+---
+![](images/1_29.png)
+
+---
+### Nigel Holmes 
+![](http://visualoop.com/media/2017/06/monster.jpg)
+---
+- https://www.nytimes.com/2016/11/29/world/americas/western-liberal-democracy.html
+![](images/1_30.png)
+---
+![](images/1_31.png)
+---
+![](images/1_32.png)
+---
+### Cardiovascular System
+![:scale 40%](https://images.fineartamerica.com/images-medium-large-5/cardiovascular-system-anatomical-travelogue.jpg)
+---
+
+Vis. provides a visual representation of objects that may include
+
+ - data
+ - algorithms
+ - results of computations
+ - processes
+ - user controls
+ - numerous other components of an application.
+---
+### Simulation Vis.
+![:scale 90%](https://rodrigonemmen.files.wordpress.com/2017/10/computational-fluid-dynamics-e1507204323163.jpg?w=1024&amp;h=567&amp;crop=1)
+
+---
+### Process Vis.
+![](images/1_22.png)
+
+---
+### Social Networks
+![:scale 75%](images/1_23.png)
+
+---
+### Agriculture (NDVI)
+![](https://precisionagricultu.re/wp-content/uploads/2017/12/satellite-NDVI-e1449688156640-620x330.png)
+
+---
+### Vis. and Other Fields
+ - Visualization vs. computer graphics
+ - scientiﬁc visualization and information visualization
+---
+### Role of the User
+ - user as designer
+ - user as explorer
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="sup/macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

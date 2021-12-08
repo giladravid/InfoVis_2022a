@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Arrange Spatial Data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <meta name="date" content="2021-11-29" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Arrange Spatial Data
+## Lesson 5
+### Gilad Ravid
+### BGU
+### 2021-11-29
+
+---
+
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```
+## data.table 1.13.6 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
+```
+
+```
+## 
+## Attaching package: 'data.table'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     between, first, last
+```
+
+```
+## Registered S3 method overwritten by 'GGally':
+##   method from   
+##   +.gg   ggplot2
+```
+---
+### Arrange Spatial Data
+- spatial semantics
+- arrange is to use the given spatial to guide layout
+- the position channel is not available for encoding other attributes
+- if the given spatial position is the attribute of primary importance (effectiveness)
+---
+### Choropleth
+- quatitative attribute encoded as color over regions delimited as area marks, where the shape of each region is determined by using given geometry
+  - how to construct a colormap
+  - what region boundaries to use
+  
+idiom | Choropleth Map
+------|-------------
+What:Data| Geographic geometry data. Table with one quantitative attribute per region
+How:Encode|Space: use given geometry for area mark boundaries. Color: sequential segmented colormap
+---
+![](images/TM_17.png)
+---
+### Other Derived Geometry
+- Scalar Field one value
+  - slicing
+  - isocontours
+  - direct volume rendering
+![](images/TM_12.png)
+---
+### Isocontours
+- A set of isolines, namely, lines that represent the contours of a particular level of the scalar value
+- occur far apart in regions of slow change and close together in regions of fast change
+- never overlap
+
+idiom | Topographic Terrain Map
+------|-------------
+What:Data| 2D spatial field; geographic data.
+What: Derived| geometry: set of isolines computed from field.
+How:Encode|Use given geographic data geometry of points, lines and region mark. use derived geometry as line mark.
+why: Tasks| Query shape
+Scale| Dozens of contour levels
+---
+![](images/TM_13.png)
+---
+### isofaces
+
+- transforms a 3D scalar spatial field into one or more derived 2D surfaces.
+- usually with intercative 3D navigation
+- outer contour surfaces would occlude all the inner ones
+- slider to control
+- transparency
+
+![:scale 80%](images/TM_14.png)
+---
+![](images/TM_15.png)
+---
+![:scale 75%](images/TM_16.png)
+
+idiom | Flexible Isosurfaces
+------|-------------
+What:Data| Spatial field.
+What: Derived| geometry: surfaces. Tree: simplified contour tree
+How:Encode|Surfaces: use given. Tree: line mark, vertical spatial position encodes isovalues
+why: Tasks| Query shape
+Scale| one Dozen contour levels
+---
+### Direct Volume Rendering
+- creates an image directly from
+the information contained within the scalar spatial ﬁeld, without deriving an intermediate geometric representation of a surface
+- complex algorithms - how to carry it out efficiently and correctly
+- transfer function that maps changes in the scalar value to opacity and color
+---
+![:scale 80%](images/TM_18.png)
+---
+idiom | Multidimensional Transfer Functions
+------|-------------
+What:Data| 3D spatial ﬁeld.
+What: Derived| 3D spatial ﬁeld: gradient of original ﬁeld.
+What: Derived|Table: two key attributes, values binned from min to max for both data and derived data. One derived quantitative value attribute (item count per bin).
+How:Encode|3D view: use given spatial ﬁeld data, color and opacity from multidimensional transfer function. Joint histogram view: area marks in 2D matrix alignment,grayscale sequential colormap.
+---
+### Vector Fields: Multiple Values
+- Cases:
+    - 2D spatial flow
+    - 3D spatial flow
+    - flow on a 2D surface embedded within 3D space
+- steady flows vs. unsteady flows
+- critical points
+![](images/TM_19.png)
+---
+### Flow Glyphs
+- local information about a cell in the field using an object with internal substructure
+- arrow: encode magnitude with length. direction with arrow orientation
+![](images/TM_20.png)
+---
+### Geometric Flow
+- The geometric ﬂow idioms compute derived geometric data from the original ﬁeld using trajectories computed from a sparse set of seed points and then directly show the derived geometry
+- how to compute the trajectories
+- The trajectory that a speciﬁc particle will follow is called a **streamline** for a steady ﬁeld and a **pathline** for an unsteady (time-varying) ﬁeld. A **streakline** traces all the particles that pass through a speciﬁc point in space.A **timeline** is formed by connecting a front of pathlines over
+time
+![](images/TM_21.png)
+https://ieeexplore-ieee-org.ezproxy.bgu.ac.il/stamp/stamp.jsp?tp=&amp;arnumber=1372179
+---
+### Texture Flow
+- rely on particle tracing, but with dense coverage across the entire ﬁeld rather than from a carefully selected set of seed points.
+
+### Feature Flow
+- The feature ﬂow vis idioms rely on global computations across the entire vector ﬁeld to explicitly locate all instances of speciﬁc structures of interest, such as critical points, vortices, and shock
+---
+### Tensor Fields: Many Values
+- All of the idiom families used for vector ﬁelds are also used for tensor ﬁelds
+- Ellipsoid Tensor Glyphs
+
+![:scale 50%](images/TM_22.png)
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="sup/macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

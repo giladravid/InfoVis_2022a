@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>D3.js</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# D3.js
+## Lesson 8
+### Gilad Ravid
+### BGU
+### 24/8/2021 (updated: 2021-12-06)
+
+---
+
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+---
+- [Example 1](DS/Example1.html) - single sataset binding
+- [Example 2](DS/Example2.html) - ploting symbols and lines
+- [Example 3](DS/Example3.html) - two datasets
+- [Example 4](DS/Example4.html) - makeList
+- [Example 5](DS/Example5.html) - makeList2
+---
+### Selecting and Binding
+- D3 is a JavaScript library for manipulating the DOM tree
+- Specifically, it must allow the user to:
+1. Specify where in the DOM tree a change should take place and which elements will be affected; the user must be able to select a node (or set of nodes).
+2. Associate individual records from the data set with specific elements or nodes in the DOM tree; enable the user to bind or join a data set to a selection of nodes.
+3. Change the size, position, and appearance of DOM elements according to the values of the data associated with them.
+- bundled in the Selection abstraction
+- create selection: d3.select(selector), d3.selectAll(selector),  d3.create(name). selector is CSS selector string or an array of node objects.
+- Methods to create subselections from selections: sel.select(selector), sel.selectAll(selector), sel.filter(selector)
+- The selector can either be a CSS selector string or an accessor function. The accessor must return an array of DOM Element instances
+---
+bs = d3.selectAll( "p" ).select( "b" );
+
+cs = d3.select( "#id123" ).selectAll( "circle" );
+
+CSS Selectors: type , #id, .class, :pseudo-class, [aatribute], ::pseudo-element
+combined (AND), comma (OR), whitespace (descendant), &gt; (direct child), + (next sibling), ~ (any sibling)
+
+- The data() method accepts an array of arbitrary values or objects and attempts to establish a one-to-one correspondence between the entries of this array and the elements in the current selection.
+- If a data point has been associated with a DOM element, the data point itself is stored in the __data__ property of the selection element.
+
+- The data() method returns a new Selection object containing those elements that were successfully bound to entries in the dataset. The data() method also populates the so-called “enter” and “exit” selections, which contain the unmatched (surplus) data points or DOM elements, respectively
+
+d3.select( "svg" ).selectAll( "circle" ).data( data ).enter().append( "circle" ).attr( "fill", "red );
+
+d3.select( "svg" ).selectAll( "circle" ).data( data, key ).exit().remove();
+
+[example 6](D3/example_6.html)
+---
+### The General Update Pattern
+
+1. Bind new data to an existing selection of elements.
+2. Remove any surplus items that do not have matching data associated anymore (the exit() selection).
+3. Create and configure all items associated with data points that did not exist before (the enter() selection).
+4. Merge the remaining items from the original selection with the newly created items from the enter() selection.
+5. Update all items in the combined selection based on the current values of the bound data set.
+
+[example 7](D3/example_7.html)
+---
+### Accesor Functions
+
+sel.attr( "fill", "red" );
+
+sel.attr( "fill",function(d, i, ns) {return d&lt;0 ? "red":"green"} );
+
+sel.attr( "fill", d =&gt; d&lt;0 ? "red" : "green" );
+---
+.pull-left[
+#### Operation on Elements of Selection
+sel.attr(name, value)
+sel.style(name, value, priority)
+sel.property(name, value)
+sel.classed(value, flag)
+sel.text(value)
+sel.html(value)
+sel.datum(value)
+sel.each(function)
+]
+.pull-right[
+#### Operating on Selection Themselves
+sel.append(item)
+sel.insert(item,before)
+sel.merge(selection)
+sel.remove()
+sel.sort(comparator)
+sel.call(function,arguments)
+sel.nodes()
+sel.node()
+sel.size()
+sel.empty()
+]
+[example 8](D3/example_8.html)
+
+---
+### Shared Parent Information
+
+&amp;lt;table&gt;
+
+&amp;lt;tr&gt;
+
+&amp;lt;td&gt;A&amp;lt;/td&gt;&amp;lt;td&gt;B&amp;lt;/td&gt;
+
+&amp;lt;/tr&gt;
+
+&amp;lt;tr&gt;
+
+&amp;lt;td&gt;C&amp;lt;/td&gt;&amp;lt;td&gt;D&amp;lt;/td&gt;
+
+&amp;lt;/tr&gt;
+
+&amp;lt;/table&gt;
+
+
+d3.selectAll("tr").selectAll("td").attr(..., (d,i,ns)=&gt;{ ... });
+
+cells were selected as elements of their respective rows, the index i holds the position of each cell within its row
+---
+d3.selectAll("td").attr(..., (d, i, ns) =&gt; { ... });
+
+index i will be the running number of the cells (from 0 to 3, in this case)
+
+d3.selectAll("tr").selectAll("td")
+.selectAll("li").attr( ..., (d,i) =&gt; { ... } );
+
+the index i would be the position of each list item within its list.
+---
+### Events
+- click
+- mosemove
+- mousedown. mouseup
+- mouseenter, mouseleave
+- mouseover, mouseout
+- keydown, keyup
+- sel.on( type, callback )
+- d3.event
+- d3.pointer( event )
+- sel.dispatch( type )
+
+- [Example 9](DS/example9.html)
+- [Example 10](DS/example10.html)
+- [Example 11](DS/example11.html)
+---
+### Transition
+1. make sure any data has been bound and all elements that are supposed to be part of the transition have been created
+2. select the elements you wish to change
+3. Invoke transition() on this selection to create a transition. Optionally, call duration(), delay(), or ease() for more control over its behavior.
+4. Set the desired end state using attr() or style()
+
+- sel.transition( tag )
+- sel.interrupt( tag )
+- trans.transition()
+- trans.selection()
+- trans.delay( value )
+- trans.duration( value )
+- trans.ease( fct )
+- trans.on( type, handler ) type= (start, end, interrupt)
+
+- [example 12](D3/example_12.html)
+---
+### Tips
+  
+- text transition
+  - d3.select("#t1").transition().attr( "fill-opacity", 0 );
+  - d3.select("#t2").transition().attr( "fill-opacity", 1 );
+
+- chain transition
+  - d3.selectAll( "circle" )
+  - .transition().duration( 2000 ).attr( "fill", "red" )
+  - .transition().attr( "fill", "blue" );
+
+- Custom interpolators
+  - [example 13](D3/example_13.html)
+  - [example 14](D3/example_14.html)
+
+- Transition events
+  - fire start, end and interrupted events
+
+- Easing
+  -   map time of transition
+  - "slow in slow out"
+---
+### Timer events
+  A special timer that will invoke a given callback once per animation frame, that is, every time the browser is about to repaint the screen.
+
+- d3.timer( callback, after, start )
+- d3.timeout( callback, after,start )
+- d3.interval( callback, interval, start )
+- t.stop()
+- d3.now()
+
+- [example 15](D3/example_15.html)
+- [example 16](D3/example_16.html)
+---
+### Generators, Components, and Layouts
+- Generators - wrappers around the &lt;path&gt; element’s
+- Components - functions that inject newly created elements into the DOM tree
+- Layouts - consume a data set and calculate the pixel coordinates and angles that graphical elements should have to represent the data set in some nontrivial way.
+
+1. Create an instance of the desired helper.
+2. Configure it as necessary (for example, by specifying accessor functions for the data set) using its member functions.
+3. Invoke it in the appropriate evaluation context.
+
+---
+### Symbols
+[Example 17](D3/example_17.html)
+
+- d3.symbol()
+- sym
+- sym.type(shape)
+- sym.size(area)
+- d3.symbols
+
+- [Example 18](D3/example_18.html)
+- [Example 19](D3/example_19.html)
+- [Example 20](D3/example_20.html)
+- [Example 21](D3/example_21.html)
+
+* d3.curveLinear // d3.curveNatural // d3.curveStep // d3.curveLinearClosed // d3.curveMonotoneX // d3.curveStepAfter // d3.curveMonotoneY // d3.curveStepBefore
+
+* d3.curveCardinal cardinal.tension(t) // d3.curveCatmullRom catrom.alpha(a) // d3.curveBundle bundle.beta(b) // 
+d3.curveBasis
+---
+### Pie Chart
+- [Example 22](D3/example_22.html)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

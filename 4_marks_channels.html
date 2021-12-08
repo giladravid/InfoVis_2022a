@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Marks and Channels</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <meta name="date" content="2021-11-01" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Marks and Channels
+## Lesson 4
+### Gilad Ravid
+### BGU
+### 2021-11-01
+
+---
+
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```
+## data.table 1.13.6 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
+```
+
+```
+## 
+## Attaching package: 'data.table'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     between, first, last
+```
+
+```
+## Registered S3 method overwritten by 'GGally':
+##   method from   
+##   +.gg   ggplot2
+```
+---
+### Marks and Channels
+- graphical elements called *marks*
+- visual *channels* to control their appearance
+- some marks examples:
+  0d point
+  1d line
+  2d area
+  3d volume
+- some channels examples:
+  position
+  color
+  shape
+  Tilt
+  size
+- Channel Types
+  - identity (what-where)
+  - magnitude (how much)
+- Mark Type
+  - table dataset
+  - networks
+    - nodes
+    - links
+        - connection
+        - containment
+---
+### Expressiveness and Effectiveness
+- The expressiveness principle dictates that the visual encoding should express all of, and only, the information in the data-set attributes
+  - The identity channels are the correct match for the categorical attributes that have no intrinsic order.
+  - The magnitude channels are the correct match for the ordered attributes, both ordinal and quantitative.
+- The effectiveness principle dictates that the importance of the attribute should match the salience of the channel
+---
+![](images/TM_9.png)
+---
+### Accuracy
+![](images/3_14.png)
+---
+### Discriminability
+
+matching the ranges: the number of different values that needs
+to be shown for the attribute being encoded must not be greater
+then the number of bins available for the visual channel used to
+encode it
+
+### Separability
+![](images/TM_10.png)
+---
+### Grouping
+- areas of containment
+- lines of connection
+- proximity
+- similarity
+
+---
+### Rules of Thumb
+- No unjustified 3D
+  - The power of the plane
+  - The Disparity of depth
+  - Occlusion hides Information
+  - Perspective distortion dangers
+  - other depth cue
+  - Tilted text isn't legibile
+  - benefits of 3D: shape perception
+  ![:scale 75%](images/TM_11.jpg)
+---
+- No Unjustified 2D
+- Eyes beat memory
+    - Memory and Attention
+    - Animation vs. side by side views
+    - change blindness
+- Resolution over immersion
+- Overview first, zoom and filter, details on demand (Ben Shneiderman)
+- Responsiveness is required
+- Get it right in B&amp;W
+- Function first, form next
+---
+### Arrange Tables
+- arrange - use spatial channels for visual encoding
+- Key, value, level
+---
+.scroll-output-100[
+
+```r
+eduPic &lt;- as.data.frame(read_excel("datasets/eduPic.xlsx",sheet = 1,col_names = TRUE))
+e2&lt;-as.data.frame(eduPic)
+names(eduPic)
+```
+
+```
+##  [1] "שנה\"ל"                                         "סמל רשות"                                      
+##  [3] "שם רשות"                                        "אשכול סוציו-אקונומי"                           
+##  [5] "שם מחוז גיאוגרפי"                               "מספר תושבים ברשות לשנת תשף"                    
+##  [7] "מספר תלמידים גרים ברשות"                        "מספר תלמידים גרים ברשות   י-יב"                
+##  [9] "מספר בתי ספר"                                   "מספר מוסדות שדווחו להם תלמידים כיתות י-י\"ב"   
+## [11] "מספר תלמידים לומדים ברשות - מצבת"               "מספר תלמידים  י'-יב'  חט\"ע - מצבת"            
+## [13] "מספר תלמידי י\"ב לומדים ברשות  -מצבת"           "תלמידי י\"ב במוסדות המגישים לבגרות"            
+## [15] "שיעור התלמידים בחינוך טכנולוגי"                 "שיעור המורים בעלי תואר שני ומעלה"              
+## [17] "שיעור המורים בעלי תואר שני ומעלה  חט\"ע"        "אחוז התאמות מחוזי ומוסדי עם אבחון"             
+## [19] "אחוז התאמות מוסדי ללא אבחון וללא מחוזי"         "שיעור תלמידים עולים"                           
+## [21] "אחוז תלמידי חינוך מיוחד הלומדים בחינוך רגיל"    "אחוז תלמידי ברשות לומדים במוסדות החינוך המיוחד"
+## [23] "מספר כיתות"                                     "מספר כיתות י'-יב"                              
+## [25] "כיתות לב עיוני"                                 "כיתות לב טכנולוגי"                             
+## [27] "כיתות מחוננים"                                  "סך מורים"                                      
+## [29] "אחוז התמדה"                                     "אחוז נשירה מלומדים"                            
+## [31] "אחוז נשירה מגרים"                               "תלמידי היל\"ה רשות לימודים"                    
+## [33] "אחוז שאלוני שק\"ד"                              "שיעור מחברות פסולות"                           
+## [35] "אחוז זכאים לבגרות  מהלומדים"                    "אחוז זכאים לבגרות - חינוך רגיל מהלומדים"       
+## [37] "אחוז זכאות לבגרות  מצטיינת מהלומדים"            "אחוז זכאות לבגרות  מצטיינת-חינוך רגיל מהלומדים"
+## [39] "אחוז זכאות 4 יחידות אנגלית"                     "אחוז זכאות 4 יחידות אנגלית  -חינוך רגיל"       
+## [41] "אחוז זכאות 5 יחידות אנגלית"                     "אחוז זכאות 5 יחידות אנגלית - חינוך רגיל"       
+## [43] "אחוז זכאות 4 יחידות מתמטיקה"                    "אחוז זכאות 4 יחידות מתמטיקה-  חינוך רגיל"      
+## [45] "אחוז זכאות 5 יחידות מתמטיקה"                    "אחוז זכאות 5 יחידות מתמטיקה-  חינוך רגיל"      
+## [47] "אחוז זכאות לבגרות  מהגרים"                      "אחוז זכאות לבגרות  מהגרים חינוך רגיל"          
+## [49] "אחוז זכאות לבגרות  מצטיינת מהגרים"              "אחוז זכאות לבגרות  מצטיינת מהגרים חינוך רגיל"  
+## [51] "גודל כיתה רשותי יסודי"                          "גודל כיתה רשותי חט\"ב"                         
+## [53] "גודל כיתה רשותי חט\"ע"
+```
+
+```r
+str&lt;-"לא רלוונטי"
+str2&lt;-"לא מחושב"
+eduPic[eduPic==str|eduPic==str2]&lt;-NA
+names(eduPic)[4]&lt;-"eshcol"
+names(eduPic)[5]&lt;-"district"
+names(eduPic)[9]&lt;-"numSchools"
+names(eduPic)[16]&lt;-"a2ndDegreePercent"
+names(eduPic)[18]&lt;-"adjustmentsPercent"
+names(eduPic)[35]&lt;-"rateBagrut"
+names(eduPic)[46]&lt;-"a5pntMathPercent"
+names(eduPic)[53]&lt;-"classSizeHigh"
+
+eduPic$a2ndDegreePerecnt&lt;-as.numeric(eduPic$a2ndDegreePercent)
+eduPic$a5pntMathPercent&lt;-as.numeric(eduPic$a5pntMathPercent)
+eduPic$adjustmentsPercent&lt;-as.numeric(eduPic$adjustmentsPercent)
+eduPic$rateBagrut&lt;-as.numeric(eduPic$rateBagrut)
+eduPic$classSizeHigh&lt;-as.numeric(eduPic$classSizeHigh)
+
+a&lt;-eduPic %&gt;%
+  group_by(eshcol) %&gt;%
+  summarise(adjRate=mean(adjustmentsPercent,na.rm=T))
+b&lt;-eduPic %&gt;%
+  group_by(district) %&gt;%
+  summarise(adjRate=mean(adjustmentsPercent,na.rm=T))
+```
+]
+---
+.scroll-output-100[
+
+```r
+ggplot(eduPic, aes(x=a2ndDegreePercent ,y=a5pntMathPercent))+geom_point()
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+```r
+ggplot(eduPic, aes(x=a2ndDegreePercent ,y=a5pntMathPercent))+geom_point()+geom_smooth(method=lm)
+```
+
+```
+## `geom_smooth()` using formula 'y ~ x'
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-3-2.png)&lt;!-- --&gt;
+]
+---
+### Scatterplots
+- Encodes two quantitative value variables using both the vertical and horizontal spatial position channels
+- Effective for: 
+    - providing overviews and characterizing distributions
+    - ﬁnding outliers and extreme values
+    - judging the correlation between two attributes.
+    - augmented with color coding to show an additional attribute
+    - bubble plot - size coded scatterplots
+    
+idiom | scatterplots
+------|-------------
+What:Data| Table: 2 quantitative value attributes
+How: Encode|Express values with horizontal and vertical spatial position and point marks.
+Why: Task | Find trends, outliers, distribution, correlation; locate clusters.
+Scale| items: hundreds
+---
+### Separate, Order, and Align: Categorical Regions
+- Spatial position is an ordered magnitude visual channel, but categorical attributes have unordered identity semantics. The principle of expressiveness will be violated if they are encoded with spatial position
+- spatial region
+---
+### List Alignment: One Key
+- Aligned list of items stretches across one of the spatial dimensions, and the region in which the values are shown stretches across the other
+---
+
+```r
+ggplot(eduPic,aes(x=district,y=numSchools))+geom_bar(stat="sum")
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+---
+idiom | Bar Charts
+------|-------------
+Waht:Data| Table: one quantitative value attribute, one categorical key attribute.
+How:Encode|Line marks, express value attribute with aligned vertical position, separate key attribute with horizontal position.
+Why: Task | Lookup and compare values.
+Scale| Key attribute: dozens to hundreds of levels.
+---
+### stacked bar chart
+- a more complex glyph for each bar
+- The length of the composite glyph still encodes a value, as in a standard bar chart, but each subcomponent also encodes a length-encoded value.
+- show information about multidimensional tables, speciﬁcally a two-dimensional table with two keys.
+- use color as well as length coding
+- easy to compare the first and last bar
+---
+
+```r
+ggplot(eduPic,aes(x=district,y=numSchools,fill=factor(eshcol,levels=c("10","9","8","7","6","5","4","3","2","1"))))+geom_bar(stat="sum")
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+idiom | Stacked Bar Charts
+------|-------------
+Waht:Data| Multidimensional table: one quantitative value attribute, two categorical key attributes.
+How:Encode|Bar glyph with length-coded subcomponents of a value attribute for each category of secondary key attribute. Separate bars by category of primary key attribute.
+Why: Task | Part-to-whole relationship, lookup values, ﬁnd trends.
+Scale| Key attribute (main axis): dozens to hundreds of levels. Key attribute (stacked glyph axis): several to one dozen
+---
+
+.scroll-output-100[
+
+```r
+corona_cities &lt;- read.csv("datasets/corona_city_table_ver_00147.csv",header = TRUE)
+corona_cities_subset&lt;-corona_cities[corona_cities$City_Code==c(6900,6500,1200,7000,3797),] 
+corona_cities_subset$Cumulative_verified_cases[corona_cities_subset$Cumulative_verified_cases=="&lt;15"]&lt;-7
+corona_cities_subset$Cumulative_verified_cases&lt;-as.numeric(corona_cities_subset$Cumulative_verified_cases)
+corona_cities_subset$Cumulated_deaths[corona_cities_subset$Cumulated_deaths=="&lt;15"]&lt;-7
+corona_cities_subset$Cumulated_deaths&lt;-as.numeric(corona_cities_subset$Cumulated_death)
+corona_cities_subset$Date&lt;-as.Date(corona_cities_subset$Date,foramt="%Y-%d-%m")
+new_c&lt;-corona_cities_subset %&gt;%
+  group_by(City_Name) %&gt;%
+  arrange(Date) %&gt;%
+  mutate(new_cases = Cumulative_verified_cases - lag(Cumulative_verified_cases, default = first(Cumulative_verified_cases)), new_deaths=Cumulated_deaths - lag(Cumulated_deaths, default = first(Cumulated_deaths)))
+
+ggplot(new_c, aes(x = Date, y =new_deaths , fill = City_Name)) + geom_stream(type="ridge")
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+```r
+ggplot(new_c, aes(x = Date, y =new_cases , fill = City_Name)) + geom_stream(type="ridge")
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-6-2.png)&lt;!-- --&gt;
+
+```r
+ggplot(new_c, aes(x=new_cases, y=new_deaths,color=City_Name)) + geom_point()+geom_smooth(method=lm,se=F,fullrange=T)
+```
+
+```
+## `geom_smooth()` using formula 'y ~ x'
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-6-3.png)&lt;!-- --&gt;
+]
+---
+### Streamgraph
+idiom | Streamgraphs
+------|-------------
+What:Data| Multidimensional table:one quantitative value attribute, one ordered key attribute, one categorical key attribute.
+What:Derived|One quantitative attribute (for layer ordering).
+How:Encode|Use derived geometry showing categorial key layers across order key attribute, layer height encodes quantitative value attribute.
+Scale|Key attributes (time, main axis): hundreds of time points. Key attributes (artists, short axis): dozens to hundreds
+---
+.scroll-output-100[
+
+```r
+ggplot(a,aes(x=eshcol,y=adjRate,group=1))+geom_point() +scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10"))
+```
+
+```
+## Warning: Removed 2 rows containing missing values (geom_point).
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+```r
+ggplot(a,aes(x=eshcol,y=adjRate,group=1))+geom_point() +geom_line()+scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10"))
+```
+
+```
+## Warning: Removed 2 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 2 row(s) containing missing values (geom_path).
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-7-2.png)&lt;!-- --&gt;
+
+```r
+ggplot(b,aes(x=district,y=adjRate,group=1))+geom_point() 
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-7-3.png)&lt;!-- --&gt;
+
+```r
+ggplot(b,aes(x=district,y=adjRate,group=1))+geom_point() +geom_line()
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-7-4.png)&lt;!-- --&gt;
+]
+---
+### Dot charts &amp; Line charts
+idiom | Dot Charts
+------|-------------
+What:Data| Table: one quantitative value attribute, one ordered key attribute
+How:Encode|Express value attribute with aligned vertical position and point marks. Separate/order into horizontal regions by key attribute.
+
+-
+
+idiom | Line Charts
+------|-------------
+What:Data| Table: one quantitative value attribute, one ordered key attribute.
+How:Encode|Dot chart with connection marks between dots.
+why|show trends
+Scale|key attribute: hundreds of levels
+---
+![](images/interactionGraph.png)
+---
+.scroll-output[
+
+```r
+ggplot(eduPic,aes(x=eshcol,y=district,fill=rateBagrut))+geom_tile()+scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10"))
+```
+
+```
+## Warning: Removed 1 rows containing missing values (geom_tile).
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+---
+### Matrix Alignment: Two Keys
+idiom | Heatmaps
+------|-------------
+What:Data| Table: two categorical key attributes, one quantitative value attribute.
+How:Encode|2D matrix alignment of area marks, diverging colormap.
+why: Task|Find clusters, outliers; summarize.
+Scale|Items: one million. Categorical attribute levels: hundreds. Quantitative attribute levels: 3–11.
+
+-
+
+idiom | Cluster Heatmaps
+------|-------------
+What:Derived| Two cluster hierarchies for table rows and columns.
+How:Encode|Heatmap: 2D matrix alignment, ordered by both cluster hierarchies. Dendrogram: connection line marks for parent–child relationships in tree.
+why|Find clusters, outliers; summarize.
+Scale|Items: one million. Categorical attribute levels: hundreds. Quantitative attribute levels: 3–11.
+---
+.scroll-output-100[
+
+```r
+pairs(eduPic[,c(9,16,18,35,46,53)] )
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+```r
+pairs(eduPic[,c(9,16,18,35,46,53)] ,upper.panel = panel.cor)
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-9-2.png)&lt;!-- --&gt;
+]
+---
+### Scatterplot Matrix (SPLOM)
+idiom | Scatterplot Matrix (SPLOM)
+------|-------------
+What:Data| Table.
+What:Derived|Ordered key attribute: list of original attributes.
+How:Encode|Scatterplots in 2D matrix alignment.
+why:Task|Find correlation, trends, outliers.
+Scale|Attributes: one dozen. Items: dozens to hundreds.
+
+#### Multiple keys
+ - Recursive subdivision
+ - volumetric Grid (not recommended)
+---
+### Spatial Axis Orientation
+- Rectilinear layout
+- Parallel layout 
+  - for more than 2 data attributes
+  - solve channel inseparability
+  - challenges:
+    - order of axes
+    - training time
+- Radial layout
+  - angle channel less accurately perceived than a rectilinear spatial position channel
+  - angle channel is inherently cyclic, because the start and end point are the same, as opposed to the inherently linear nature of a position channel (nonmonotonic)
+  - Radial layouts may be more effective than rectilinear ones in showing the periodicity of patterns (expressiveness)
+  - Radial layouts imply an asymmetry of importance between the two attributes
+---
+.scroll-output-100[
+
+```r
+ggparcoord(data = eduPic,  columns = c(35,46,16,18,53))
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+```r
+ggparcoord(data = eduPic[eduPic$district=="דרום",],  columns = c(35,46,16,18,53))
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-10-2.png)&lt;!-- --&gt;
+]
+---
+idiom | Parallel Coordinates
+------|-------------
+What:Data|Table: many value attributes.
+How:Encode|Parallel layout: horizontal spatial position used to separate axes, vertical spatial position used to express value along each aligned axis with connection line marks as segments between them.
+why:Tasks|Find trends, outliers, extremes, correlation.
+Scale|Attributes: dozens along secondary axis. Items: hundreds.
+---
+.scroll-output-100[
+
+```r
+ggplot(eduPic,aes(x=district,y=numSchools))+geom_bar(stat="sum")+ylim(-800,1200)
+```
+
+```
+## Warning: Removed 1 rows containing missing values (geom_bar).
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+```r
+ggplot(eduPic,aes(x=district,y=numSchools))+geom_bar(stat="sum")+ylim(-800,1200)+ coord_polar(start = 0)
+```
+
+```
+## Warning: Removed 1 rows containing missing values (geom_bar).
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-11-2.png)&lt;!-- --&gt;
+]
+---
+idiom |Radial Bar Charts
+------|-------------
+What:Data|Table: one quantitative attribute, one categorical attribute.
+How:Encode|Length coding of line marks; radial layout.
+---
+#### pie charts
+- Pie charts encode a single attribute with area marks and the angle channel
+- Angle judgement on area marks are less accurate than length judgement on line marks. 
+- The wedges vary in width along the radial axis, from narrow near the center to wide near the outside, making the area judgement particularly difﬁcult.
+- part of a whole
+---
+
+```r
+ggplot(eduPic, aes(x="", y=numSchools, fill=district)) +  geom_bar(stat="sum", width=1) +  coord_polar("y", start=0)+theme_void()
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+idiom | Pie Charts
+------|-------------
+What:Data|Table: one quantitative attribute, one categorical attribute.
+How:Encode|Area marks (wedges) with angle channel; radial layout.
+why:Tasks|Part–whole relationship.
+Scale|One dozen categories.
+---
+
+```r
+ggplot(eduPic,aes(x=district,y=numSchools))+geom_bar(stat="sum")+ coord_polar(start = 0)
+```
+
+![](4_marks_channels_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+---
+idiom | Polar Area Charts
+------|-------------
+What:Data|Table: one quantitative attribute, one categorical attribute.
+How:Encode|Area marks (wedges) with length channel; radial layout.
+why:Tasks|Part–whole relationship.
+Scale|One dozen categories.
+
+-
+
+idiom | Normalized Stacked Bar Charts
+------|-------------
+What:Data|Multidimensional table: one quantitative value attribute, two categorical key attributes.
+What: Derived|One quantitative value attribute (normalized version of original attribute).
+How:Encode|Line marks with length channel; rectilinear layout.
+why:Tasks|Part–whole relationship.
+Scale|One dozen categories for stacked attribute. Several dozen categories for axis attribute.
+---
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="sup/macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

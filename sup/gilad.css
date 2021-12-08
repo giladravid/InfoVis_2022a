@@ -1,0 +1,33 @@
+.scroll-output {
+  height: 60%;
+  overflow-y: scroll;
+}
+.scroll-output-100 {
+  height: 100%;
+  overflow-y: scroll;
+}
+.scroll-output-80 {
+  height: 80%;
+  overflow-y: scroll;
+}
+.small { 
+  font-size: 50% 
+}
+.img-w {
+    max-width:640px; /* you can use % */
+    height: auto;
+}
+.img-h {
+    height: auto; 
+    width: auto; 
+ /*   max-height: 200px;*/
+    max-width: 300px;
+}
+
+.red {
+  color: red; 
+}
+.img-half {
+    max-width:50%; 
+    height: 50%;
+}

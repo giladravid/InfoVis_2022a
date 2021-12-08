@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Colors</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gilad Ravid" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="sup/gilad.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Colors
+## Lesson 7
+### Gilad Ravid
+### BGU
+### 24/8/2021 (updated: 2021-12-06)
+
+---
+
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+---
+### Eight Visual Variables
+- primitives, marks
+- primitives by themselves do not defne information displays but their spatial arrangement
+- position, shape, size, brightness, color, orientation, texture, motion
+---
+### Position
+- has the greatest impact on display of information
+- The first step in "reading" a visualzation
+- better to maximize the spread of representation
+- avoid overlaps
+- FAQ
+    - where do most of the data fall?
+    - Are there visible trends?
+    - proximity, symmetry
+    - are there clusters and structures?
+- scale applied to variables to remap values to revel structure
+    - linear scale
+    - logarithmic scale
+    - projection from space to space (usualy of lower dimensionality)
+    
+- Axes - graphical elemnts the provide additional information for undersanding how the visual space is defined
+    - tick-marks indicating intervals
+    - text labels provide data values
+    - title contains the name of the data variable
+    
+---
+### Shape
+- mark: points, line, areas, volumes and their compositions
+- does not include differences in sizes, shades, orientation
+- consider the differentinablity between marks
+- in a given visualization must have similar area and complexity
+
+---
+
+```r
+grid &lt;- expand.grid(1:5, 6:1)
+plot(grid, pch = 0:26, cex = 2.5,
+     yaxt = "n", xaxt = "n",
+     ann = FALSE, xlim = c(0.5, 5.25),
+     ylim = c(0.5, 6.5))
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+---
+### Size
+ - Can be maped to interval and continuous data variable
+ - Not recomanded for categorical data
+ - with irregular shapes size become qualitative measure
+ 
+### Brightness
+- luminance
+- distinguishablity limited by perception 
+- recomanded to use perceptually linear brightness scale
+---
+
+```r
+barplot(rep(1,56), col = hcl(300,60,25:100),space = 0,border = NA)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+### Color Theory
+![](images/4_11.png)
+---
+### Color Wheel
+![](images/4_12.jpg)
+![](images/4_13.png)
+---
+### RGB Vs. CMYK
+![](images/4_14.png)
+---
+### 
+- Additive Theory
+  - White (sunlight) radiates ALL light
+  - Black radiates no light
+  - Light-emitting media use the process of capturing and radiating light, therefore they use Additive (Light) Theory
+  - Primary colors in Additive Theory: Red	( R ) Green 	( G ) Blue	( B )
+  - All the primaries mixed together to make WHITE
+  - Additive (Light) Theory is used in computer monitors, television, theater lighting, and video production.
+- Subtractive Theory
+  - Black absorbs most light
+  - White reflects most light
+  - Colored Pigments absorb light and reflect only the frequency of the pigment color. 
+  - All colors other than the pigment colors are absorbed, so this is called subtractive color theory.
+  - Primary colors in Subtractive Theory: Cyan	( C ) Magenta	( M ) Yellow	( Y ) Black	( K )
+  - Subtractive or Pigment Theory is used in desktop and commercial printing.
+---
+### Painter’s Color Wheel (RYB)
+![](images/4_15.jpeg)
+---
+### Color
+- RGB vs. HSV
+- Hue represent the dominant wavelength [The technical name for color]
+- Saturation is the level of hue relative to gray (purity) [brightness or dullness]
+- Value  lightness or darkness
+- Mapping data value to color
+- interval and categorial values
+- https://colorbrewer2.org/
+- https://color.adobe.com/
+- https://paletton.com/
+
+.img-half[
+.pull-left[![](images/4_4.jpg)].pull-right[![](images/4_5.jpg)]
+]
+
+---
+![](images/4_6.jpg)
+---
+.scroll-output-100[
+
+```r
+myDF&lt;-read.csv("datasets/dogstype.csv", fileEncoding = "iso-8859-8")
+ggplot()+geom_point(data=myDF,aes(x=גודל.יחסי,y=פופולאריות,color=קלות.אילוף),position="jitter")
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+]
+---
+### Hue, Tint, Shade, Tone
+.scroll-output[
+
+```r
+r&lt;-255
+g&lt;-0
+b&lt;-0
+a&lt;-0.5
+c1=rgb(r,g,b,maxColorValue = 255)
+c1
+```
+
+```
+## [1] "#FF0000"
+```
+
+```r
+wheel(c1,num=12,verbose=FALSE,cex = 0.01 )
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+  - bold, cheerful, exciting
+  
+- Tint [Hue + White]
+
+```r
+c2=rgb(r+(255-r)*a,g+(255-g)*a,b+(255-b)*a,maxColorValue = 255)
+wheel(c2,num=12,verbose=FALSE,cex=0.01)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+  - soft, youthful, soothing
+  
+- shade [Hue + Black]
+
+```r
+c3=rgb(r+(0-r)*a,g+(0-g)*a,b+(0-b)*a,maxColorValue = 255)
+wheel(c3,num=12,verbose=FALSE,cex=0.01)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+  - deep, powerfull, mysterious
+  
+- tone [Hue + Gray]
+
+```r
+c4=rgb(r+(128-r)*a,g+(128-g)*a,b+(128-b)*a,maxColorValue = 255)
+wheel(c4,num=12,verbose=FALSE,cex=0.01)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+  - pleasing to the eye, complex, subtle, sophisticated
+]
+---
+- Monochromatic uses different values of the same hue, including tints and shades
+- Analogous: A selection of colors that are adjacent on the color wheel.
+  - provide harmonious blends
+- Complementary: Colors that are opposite on the wheel.  High Contrast
+  - The more a color contrasts with the colors around it, the more easily visible that color will appear.
+- Triadic: 3 colors equally spaced
+---
+![](images/1_35.png)
+https://hclwizard.org/
+---
+### Background
+![](images/4_16.png)
+---
+![](https://infobeautiful4.s3.amazonaws.com/2010/04/2552_ColoursInCulture-3.png)
+---
+![](https://miro.medium.com/max/2000/1*AQERyu3mi2CIN9QGzZdUPQ.png)
+---
+![](https://miro.medium.com/max/3000/1*ibsq4CbUl-psQZaEAO_3rQ.jpeg)
+---
+### Tips
+- When small symbols, text, or other detailed graphical representations of information are displayed using color on a differently colored background,
+always ensure luminance contrast with the background
+- moving targets and stereoscopic depth influenced by luminance contrast
+- If large areas are defined using nearly equiluminous colors, consider using thin border lines with large luminance differences (from the colors of the areas) to help define the shapes.
+![](images/1_36.png)
+---
+### Colors are relative
+![](images/1_37.png)
+---
+- If using color chroma to encode numerical quantity, use greater chroma to represent greater numerical quantities. 
+- Avoid using a chroma sequence to encode more than four values.
+- Colors for labling (Nominal Codes)
+    - Sufficient Distinctness
+    - We are far more sensitive to differences between large patches of color than small
+patches of color.large areas - the colors should be of low chroma (saturation) and differ
+only slightly from one another. Small marks strong,highly saturated colors.
+    - Luminance Contrast with Background
+    ![](images/4_8.png)
+---
+- Consider using nameable colors such as red, green, yellow, blue, brown, pink purple, and gray for color coded symbols. they are more remamberable
+- Color Semantics (red=danger, green=go, healthy)
+- Color Blindness
+    - To create a set of symbol colors that can be distinguished by most color-blind individuals, ensure variation in the yellow-blue direction.
+- Do not use more than 10 colors for coding symbols if reliable identification is required, especially if the symbols are to be used against a variety of
+backgrounds.
+---
+### Color Highlight
+- When highlighting text by changing the color of the font, it is important to maintain luminance contrast with the background. With a white background, high-saturation dark colors should be used to change the font color.
+- When highlighting text by changing the background color, low-saturation light colors should be used if the text is black on white. The exception is yellow, because it is can be both light and have high saturation
+---
+### Pseudocolor Sequences
+![](images/4_9.png)
+---
+### Tasks in colormaps
+1. Resolve features - our ability to perceive that a feature is present
+2. Identify patterns - e.g. identifying highs and lows, telling positive from negative features
+3. Reading values from a key
+4. Classifying regions
+---
+![](images/4_10.png)
+---
+- The most important ordering is in terms of luminance
+- rainbow sequence “hinders this task [of effectively conveying information] by confusing, obscuring and actively misleading.”
+- using a uniform color space in which equal perceptual steps correspond to equal metric steps (Robertson &amp; O’Callaghan, 1988)
+- No known visualization technique is capable of accurately conveying ratios with any precision.
+- To represent zero values construct a double ended colormap, with a neutral color, such as white or black in the middle. (diverging sequences,bipolar sequences)
+- red-green sequence was most effective (Spence and Efendov (2001))
+- Bivariate Color Sequences
+
+---
+### Color Wheel
+.scroll-output[
+
+```r
+color&lt;-"red"
+wheel(color,num=18)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+```
+##  [1] "#FF0000" "#FF5500" "#FFAA00" "#FFFF00" "#AAFF00" "#55FF00" "#00FF00"
+##  [8] "#00FF55" "#00FFAA" "#00FFFF" "#00AAFF" "#0055FF" "#0000FF" "#5500FF"
+## [15] "#AA00FF" "#FF00FF" "#FF00AA" "#FF0055"
+```
+
+```r
+#picked&lt;-wheel(color,num=18)[16]
+picked&lt;-"#FF66FFFF"
+analogous(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-2.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#FF66B3FF" "#B366FFFF"
+```
+
+```r
+complementary(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-3.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#66FF66FF"
+```
+
+```r
+splitComp(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-4.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#B3FF66FF" "#66FFB2FF"
+```
+
+```r
+tetradic(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-5.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#FF6666FF" "#66FF66FF" "#66FFFFFF"
+```
+
+```r
+square(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-6.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#FFB366FF" "#66FF66FF" "#66B2FFFF"
+```
+
+```r
+triadic(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-7.png)&lt;!-- --&gt;
+
+```
+## [1] "#FF66FFFF" "#FFFF66FF" "#66FFFFFF"
+```
+
+```r
+sequential(picked)
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-8.png)&lt;!-- --&gt;
+
+```
+##  [1] "#FFFFFFFF" "#FFF2FFFF" "#FFE6FFFF" "#FFD9FFFF" "#FFCCFFFF" "#FFBFFFFF"
+##  [7] "#FFB3FFFF" "#FFA6FFFF" "#FF99FFFF" "#FF8CFFFF" "#FF80FFFF" "#FF73FFFF"
+## [13] "#FF66FFFF" "#FF59FFFF" "#FF4CFFFF" "#FF40FFFF" "#FF33FFFF" "#FF26FFFF"
+## [19] "#FF19FFFF" "#FF0DFFFF" "#FF00FFFF"
+```
+
+```r
+pals()
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-9-9.png)&lt;!-- --&gt;
+]
+---
+# XXX
+
+```r
+library("colorspace") 
+#my_pal &lt;- choose_palette()
+#my_pal(3)
+```
+---
+### Orientation
+- How a mark is rotated in connection with data variable
+- cannot be used with all marks
+
+```r
+myDF&lt;-read.csv("datasets/dogstype.csv", fileEncoding = "iso-8859-8")
+
+ggplot()+geom_text(data=myDF,aes(x=פופולאריות,y=נשירה,angle=(18*קלות.אילוף),label="\U2191")) #U2191; U25CA
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+---
+
+```r
+my_data &lt;- read_excel("datasets/2018.xlsx",sheet=2,range = "a4:KB260")
+```
+
+```
+## New names:
+## * `` -&gt; ...23
+## * `` -&gt; ...24
+## * `` -&gt; ...25
+## * `` -&gt; ...26
+## * `` -&gt; ...27
+## * ...
+```
+
+```r
+my_data&lt;- my_data[-1,]
+my_data[,12]&lt;-as.numeric(unlist(my_data[,12]))
+my_data[,22]&lt;-as.numeric(unlist(my_data[,22]))
+```
+---
+
+```r
+names(my_data)[12]&lt;-"percent_0_4"
+names(my_data)[22]&lt;-"people2sqkm"
+ggplot()+geom_point(data=my_data,aes(x=people2sqkm , y=percent_0_4))
+```
+
+![](7_colors_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+---
+### Texture
+- modest number of distinct types exist
+### Motion
+- associated woth other visual variables
+- symbolize change
+- not for print
+---
+### Jacques Bertin (1967)
+Semiology of Graphics: Diagrams, Networks, Maps
+
+- separation of content (the information to encode) from the container (the properties of the graohics system)
+- A graphic is defined as a combination of plane properties (implantation plus imposition) and retinal variables (visual variabels above the plane)
+- Graphics vocabulary
+    - plane: homogeneous with two dimensions
+    - marked by implantations
+    - implantations: points, lines, areas
+    - imposition: the arrengment of the implanatations
+    - retinal variables: size, value (saturation), texture, color, orientation, shape
+
+---
+### Effect of Visual Variables
+ 
+- Selective (immediately isolate a group of signs)
+    - Size (length, area, volume)
+    - Brightness
+    - Texture
+    - Color( hue)
+    - Orientation
+- Associative (grouping across changes in the variable)
+    - Texture
+    - Color
+    - Orientation
+    - Shape
+---
+
+### Effect of Visual Variables (2)
+- Ordinal (immediately recognizable sequence)
+    - Texture
+    - Size
+    - Brightness
+- Proportional (estimation of the actual numerical difference between symbols)
+    - Size
+    - Orientation
+    - Brightness
+- Separating (all elements are visible)
+    - Texture
+    - Color
+    - Orientation
+    - Shape
+---
+### Effect of Visual Variables (3)
+![](images/4_7.png)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
